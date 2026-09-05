@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#080d1e" />
+    <title>AI Academy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <canvas id="sky-canvas" aria-hidden="true"></canvas>
+    <main id="app">
+      <section id="login-view" class="login-view" aria-labelledby="login-title">
+        <div class="login-world">
+          <div class="orbital-ring ring-one"></div>
+          <div class="orbital-ring ring-two"></div>
+          <div class="planet planet-a"></div>
+          <div class="planet planet-b"></div>
+          <div class="nova-login" aria-label="Nova the AI Buddy">
+            <div class="nova-antenna"></div>
+            <div class="nova-face"><span></span><span></span></div>
+            <div class="nova-core"></div>
+            <div class="nova-arm nova-arm-left"></div>
+            <div class="nova-arm nova-arm-right"></div>
+          </div>
+        </div>
+        <div class="login-panel">
+          <div class="academy-mark"><i data-lucide="sparkles"></i><span>AI ACADEMY</span></div>
+          <p class="eyebrow">THE NEXT ADVENTURE STARTS HERE</p>
+          <h1 id="login-title">Train your mind.<br /><em>Build the future.</em></h1>
+          <p class="intro">Meet Nova, your AI learning companion, and discover how machines learn from images, sounds, words, and your brilliant ideas.</p>
+          <div class="learning-notice"><i data-lucide="shield-alert"></i><span><strong>For learning only.</strong> Real-world AI can make mistakes. Check answers and use AI responsibly.</span></div>
+          <form id="login-form" novalidate>
+            <label for="username">Pilot name</label>
+            <div class="input-wrap"><i data-lucide="user-round"></i><input id="username" name="username" autocomplete="username" placeholder="Type your name" value="user" /></div>
+            <label for="password">Access code</label>
+            <div class="input-wrap"><i data-lucide="key-round"></i><input id="password" type="password" name="password" autocomplete="current-password" placeholder="Enter your code" value="1234" /></div>
+            <p id="login-error" class="form-error" role="alert"></p>
+            <button class="button button-primary login-button" type="submit"><span>Launch AI Academy</span><i data-lucide="arrow-up-right"></i></button>
+          </form>
+          <p class="demo-hint">Demo access: <code>user</code> / <code>1234</code></p>
+        </div>
+      </section>
+
+      <section id="academy-view" class="academy-view hidden" aria-label="AI Academy dashboard">
+        <header class="topbar">
+          <button class="logo-button" type="button" data-view="home" aria-label="Go to academy home"><i data-lucide="sparkles"></i><span>AI ACADEMY</span></button>
+          <div class="top-progress"><span>CADET PROGRESS</span><div class="progress-track"><div id="global-progress" class="progress-fill"></div></div><b id="progress-label">0 / 7 chapters</b></div>
+          <div class="top-actions"><button class="icon-button" type="button" aria-label="Sound settings" data-toast="Sound effects are ready for the full game build."><i data-lucide="volume-2"></i></button><button class="profile-button" type="button" data-view="profile"><span class="profile-orb">U</span><span>User</span><i data-lucide="chevron-down"></i></button></div>
+        </header>
+        <div class="academy-layout">
+          <nav class="sidebar" aria-label="Learning chapters">
+            <p class="side-label">YOUR QUEST</p>
+            <button class="side-link active" data-view="home"><i data-lucide="map"></i><span>Academy Map</span></button>
+            <button class="side-link" data-view="robo"><i data-lucide="bot"></i><span>Create a Robo</span><b>00</b></button>
+            <button class="side-link" data-view="untrained_ask"><i data-lucide="help-circle"></i><span>Ask Robo Without Training</span><b>01</b></button>
+            <button class="side-link" data-view="supervised"><i data-lucide="brain-circuit"></i><span>Supervised Learning</span><b>02</b></button>
+            <button class="side-link" data-view="unsupervised"><i data-lucide="layers"></i><span>Unsupervised Learning</span><b>03</b></button>
+            <button class="side-link" data-view="generative"><i data-lucide="sparkles"></i><span>Generative AI</span><b>04</b></button>
+            <button class="side-link" data-view="applications"><i data-lucide="cpu"></i><span>AI Applications</span><b>05</b></button>
+            <button class="side-link" data-view="reality"><i data-lucide="shield-alert"></i><span>AI Can Make Mistakes</span><b>06</b></button>
+            <div class="side-divider"></div>
+            <button class="side-link" data-view="extract"><i data-lucide="disc-3"></i><span>Extract Intelligence</span><b>07</b></button>
+            <button class="side-link creator-link" data-view="creator"><i data-lucide="rocket"></i><span>Creator Lab</span><b>08</b></button>
+            <div class="nova-side"><div class="mini-nova"><span></span><span></span></div><p><strong>Nova says:</strong> Every great AI starts with a curious human.</p></div>
+          </nav>
+          <section id="content-view" class="content-view" tabindex="-1"></section>
+        </div>
+      </section>
+    </main>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
