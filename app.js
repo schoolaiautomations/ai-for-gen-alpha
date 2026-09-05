@@ -98,6 +98,88 @@ const unsupervisedMysteryTests = [
   }
 ];
 
+
+const generativeBooksDataset = [
+  {
+    id: "book-1",
+    title: "The Great World Encyclopedia",
+    author: "Global Scholars Press",
+    category: "Facts & Sciences",
+    emoji: "🌍",
+    color: "#38bdf8",
+    bg: "linear-gradient(145deg, rgba(2, 132, 199, 0.45), rgba(15, 23, 42, 0.85))",
+    borderColor: "rgba(56, 189, 248, 0.4)",
+    words: "2,450,000 words",
+    topics: ["Mud Physics", "Pond Ecology", "Cattle Instincts", "Geography"],
+    desc: "Provides deep factual knowledge of rural landscapes, weather, and physical cause-and-effect."
+  },
+  {
+    id: "book-2",
+    title: "Anthology of Classic Folktales",
+    author: "Heritage Storytellers",
+    category: "Story Arc & Drama",
+    emoji: "📖",
+    color: "#c084fc",
+    bg: "linear-gradient(145deg, rgba(168, 85, 247, 0.35), rgba(15, 23, 42, 0.85))",
+    borderColor: "rgba(192, 132, 252, 0.4)",
+    words: "1,820,000 words",
+    topics: ["Rising Action", "Crisis", "Courage", "Resolution"],
+    desc: "Teaches classical storytelling arcs: introducing trouble, building tension, and satisfying endings."
+  },
+  {
+    id: "book-3",
+    title: "Storm Chronicles & The Living Sky",
+    author: "Meteorology Institute",
+    category: "Atmosphere & Weather",
+    emoji: "🌧️",
+    color: "#22d3ee",
+    bg: "linear-gradient(145deg, rgba(6, 182, 212, 0.35), rgba(15, 23, 42, 0.85))",
+    borderColor: "rgba(34, 211, 238, 0.4)",
+    words: "1,150,000 words",
+    topics: ["Monsoons", "Flash Floods", "Dark Clouds", "Rain Squalls"],
+    desc: "Supplies rich sensory vocabulary: torrential downpours, rising water, and evening storm skies."
+  },
+  {
+    id: "book-4",
+    title: "Village Life & Rural Communities",
+    author: "Cultural Archive Society",
+    category: "Community & Empathy",
+    emoji: "🏡",
+    color: "#34d399",
+    bg: "linear-gradient(145deg, rgba(16, 185, 129, 0.35), rgba(15, 23, 42, 0.85))",
+    borderColor: "rgba(52, 211, 153, 0.4)",
+    words: "1,640,000 words",
+    topics: ["Elders", "Mutual Aid", "Lanterns", "Mud Huts"],
+    desc: "Provides cultural context of village solidarity: caring for elderly neighbors and farming life."
+  },
+  {
+    id: "book-5",
+    title: "Comprehensive English Lexicon & Syntax",
+    author: "Linguistics Academy",
+    category: "Grammar & Flow",
+    emoji: "📚",
+    color: "#fbbf24",
+    bg: "linear-gradient(145deg, rgba(245, 158, 11, 0.35), rgba(15, 23, 42, 0.85))",
+    borderColor: "rgba(251, 191, 36, 0.4)",
+    words: "3,100,000 words",
+    topics: ["Sentence Flow", "Transitions", "Tone", "Grammar"],
+    desc: "Equips the AI with seamless grammar, descriptive adjectives, and smooth paragraph transitions."
+  },
+  {
+    id: "book-6",
+    title: "Fables of Kindness & Heroic Acts",
+    author: "Compassion Library",
+    category: "Morals & Teamwork",
+    emoji: "🏮",
+    color: "#f472b6",
+    bg: "linear-gradient(145deg, rgba(236, 72, 153, 0.35), rgba(15, 23, 42, 0.85))",
+    borderColor: "rgba(244, 114, 182, 0.4)",
+    words: "1,200,000 words",
+    topics: ["Lanterns", "Ropes", "Heroism", "Gratitude"],
+    desc: "Teaches how human teamwork, bravery, and compassion bring communities together in adversity."
+  }
+];
+
 const villageDataPoints = [
   { icon: "🐄", text: "A cow gets stuck in the muddy village pond." },
   { icon: "🌧️", text: "Dark clouds bring heavy rain during evening chores." },
@@ -193,6 +275,7 @@ function canAccess(view) {
   return index < 0 || chapterOrder.slice(0, index).every((chapter) => state.completed.has(chapter));
 }
 function navigate(view) {
+  content?.classList.remove("no-scroll");
   if (!canAccess(view)) {
     const nextChapter = chapters[chapterOrder.indexOf(view) - 1];
     toastMessage(`Complete ${nextChapter.label} before this mission unlocks.`);
@@ -1545,7 +1628,9 @@ function brainstormMarkup(title, copy) {
    CHAPTER 02: SUPERVISED LEARNING (IMAGES)
    ========================================== */
 function renderSupervised() {
-  if (state.supervisedStage === "test" || (state.supervisedTrained && state.supervisedStage !== "train")) {
+  if (state.supervisedStage === "global_data") {
+    renderGlobalDataImport();
+  } else if (state.supervisedStage === "test" || (state.supervisedTrained && state.supervisedStage !== "train")) {
     renderSupervisedTest();
   } else {
     renderSupervisedTrain();
@@ -1736,7 +1821,10 @@ function renderSupervisedTest() {
           <p class="banner-subtitle"><strong>Nova</strong> has learned from your labels and is ready to test!</p>
         </div>
       </div>
-      <button id="retrain-supervised-btn" class="button button-outline" style="font-size:11px;padding:6px 14px;background:rgba(255,255,255,0.08);border-radius:8px;border:1px solid rgba(255,255,255,0.25);color:#cbd9ef;white-space:nowrap;">${icon("refresh-cw")} Train Again with Labeled Cards</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button id="retrain-supervised-btn" class="button button-outline" style="font-size:11px;padding:6px 12px;background:rgba(255,255,255,0.08);border-radius:8px;border:1px solid rgba(255,255,255,0.25);color:#cbd9ef;white-space:nowrap;">${icon("refresh-cw")} Train Again</button>
+        <button id="quick-global-btn" class="button button-outline" style="font-size:11px;padding:6px 12px;background:rgba(56,189,248,0.18);border-radius:8px;border:1px solid rgba(56,189,248,0.5);color:#7dd3fc;white-space:nowrap;">${icon("globe")} Worldwide Data Stream</button>
+      </div>
     </div>
 
     <div class="inspection-layout">
@@ -1767,6 +1855,10 @@ function renderSupervisedTest() {
 
   document.querySelector("#retrain-supervised-btn")?.addEventListener("click", () => {
     state.supervisedStage = "train";
+    renderSupervised();
+  });
+  document.querySelector("#quick-global-btn")?.addEventListener("click", () => {
+    state.supervisedStage = "global_data";
     renderSupervised();
   });
 
@@ -1832,14 +1924,23 @@ function renderSupervisedTest() {
         </div>
 
         <div style="margin-top:16px;padding-top:14px;border-top:1px dashed rgba(67,119,183,0.25);">
-          <button id="goto-unsupervised-btn" class="button button-primary" style="width:100%;">
-            <span>Proceed to Unsupervised Learning (Ch 03)</span>${icon("arrow-right")}
+          <button id="goto-global-data-btn" class="button button-primary" style="width:100%;background:linear-gradient(135deg,#0284c7,#0369a1);box-shadow:0 0 20px rgba(56,189,248,0.4);">
+            <span>Next: Import Worldwide Image Data (Cars, Bikes, Humans)</span>${icon("globe")}
           </button>
+          <div style="margin-top:8px;">
+            <button id="goto-unsupervised-direct-btn" class="button button-outline" style="width:100%;font-size:11px;padding:6px;color:#94a3b8;border-color:rgba(255,255,255,0.15);">
+              <span>Skip to Chapter 03 (Unsupervised Learning)</span>${icon("chevron-right")}
+            </button>
+          </div>
         </div>
       `;
       refreshIcons();
       document.querySelector("#supervised-learning-btn")?.addEventListener("click", showSupervisedModal);
-      document.querySelector("#goto-unsupervised-btn")?.addEventListener("click", () => {
+      document.querySelector("#goto-global-data-btn")?.addEventListener("click", () => {
+        state.supervisedStage = "global_data";
+        renderSupervised();
+      });
+      document.querySelector("#goto-unsupervised-direct-btn")?.addEventListener("click", () => {
         showNovaUpgradeTransition(2, "unsupervised");
       });
       complete("supervised");
@@ -1892,6 +1993,434 @@ function showSupervisedModal() {
   }
   modal.classList.remove("hidden");
   refreshIcons();
+}
+
+
+
+
+/* ===================================================
+   CHAPTER 02.5: WORLDWIDE IMAGE DATA INGESTION
+   =================================================== */
+
+function playSynthSound(type) {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    if (type === "stream") {
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(420, now);
+      osc.frequency.exponentialRampToValueAtTime(1200, now + 0.16);
+      gain.gain.setValueAtTime(0.05, now);
+      gain.gain.linearRampToValueAtTime(0, now + 0.16);
+      osc.start(now);
+      osc.stop(now + 0.16);
+    } else if (type === "lock") {
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(880, now);
+      osc.frequency.setValueAtTime(1320, now + 0.08);
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.linearRampToValueAtTime(0, now + 0.14);
+      osc.start(now);
+      osc.stop(now + 0.14);
+    } else if (type === "complete") {
+      [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.type = "sine";
+        o.frequency.value = freq;
+        g.gain.setValueAtTime(0.06, now + idx * 0.08);
+        g.gain.linearRampToValueAtTime(0, now + idx * 0.08 + 0.25);
+        o.start(now + idx * 0.08);
+        o.stop(now + idx * 0.08 + 0.25);
+      });
+    }
+  } catch (err) {}
+}
+
+const allWorldVisionDataset = [
+  // Column 1 Items
+  { id: "w-dog", cat: "animals", name: "Dog", emoji: "🐶", sub: "Domestic Canine", score: "99.4%", loc: "Tokyo", tags: ["Snout", "Ears", "Fur Pattern"] },
+  { id: "w-pizza", cat: "food", name: "Pizza", emoji: "🍕", sub: "Italian Dish", score: "99.5%", loc: "Rome", tags: ["Crust", "Cheese", "Circular Slice"] },
+  { id: "w-laptop", cat: "tech", name: "Laptop", emoji: "💻", sub: "Computing Device", score: "98.9%", loc: "San Francisco", tags: ["Keyboard", "OLED Display", "Hinge"] },
+  { id: "w-car", cat: "vehicles", name: "Cyber Car", emoji: "🚗", sub: "Autonomous EV", score: "99.5%", loc: "Austin", tags: ["LiDAR", "Aerodynamic Chassis", "Wheels"] },
+  { id: "w-pedestrian", cat: "humans", name: "Pedestrian", emoji: "🚶", sub: "Walking Person", score: "99.3%", loc: "New York", tags: ["Upright Stride", "Head", "Torso"] },
+  { id: "w-soccer", cat: "sports", name: "Soccer Ball", emoji: "⚽", sub: "Sport Equipment", score: "99.9%", loc: "Rio de Janeiro", tags: ["Pentagon Patch", "Sphere", "Leather"] },
+  { id: "w-tree", cat: "nature", name: "Pine Tree", emoji: "🌲", sub: "Conifer Tree", score: "98.7%", loc: "Vancouver", tags: ["Needles", "Trunk", "Cone Shape"] },
+  { id: "w-backpack", cat: "objects", name: "Backpack", emoji: "🎒", sub: "Carry Bag", score: "97.9%", loc: "São Paulo", tags: ["Zippers", "Shoulder Straps", "Canvas"] },
+  { id: "w-cat", cat: "animals", name: "Cat", emoji: "🐱", sub: "Feline Pet", score: "98.8%", loc: "London", tags: ["Whiskers", "Paws", "Eyes"] },
+  { id: "w-burger", cat: "food", name: "Burger", emoji: "🍔", sub: "Fast Food", score: "98.9%", loc: "New York", tags: ["Sesame Bun", "Patty", "Layers"] },
+  { id: "w-phone", cat: "tech", name: "Smartphone", emoji: "📱", sub: "Mobile Tech", score: "99.6%", loc: "Seoul", tags: ["Bezel Screen", "Camera Notch", "Glass"] },
+  { id: "w-bike", cat: "vehicles", name: "Commuter Bike", emoji: "🚲", sub: "Two-Wheeler", score: "98.1%", loc: "Amsterdam", tags: ["Spoke Wheels", "Chain", "Handlebars"] },
+  { id: "w-runner", cat: "humans", name: "Runner", emoji: "🏃", sub: "Athletic Motion", score: "98.5%", loc: "Melbourne", tags: ["Forward Lean", "Knee Extension", "Arm Swing"] },
+  { id: "w-basketball", cat: "sports", name: "Basketball", emoji: "🏀", sub: "Court Ball", score: "99.8%", loc: "Chicago", tags: ["Orange Pebbled", "Black Ribs", "Sphere"] },
+  { id: "w-flower", cat: "nature", name: "Flower", emoji: "🌸", sub: "Cherry Blossom", score: "99.2%", loc: "Kyoto", tags: ["Petals", "Pistil", "Stem"] },
+  { id: "w-watch", cat: "objects", name: "Smartwatch", emoji: "⌚", sub: "Wrist Timepiece", score: "98.9%", loc: "Zurich", tags: ["Wristband", "Dial Bezel", "Crown"] },
+
+  // Column 2 Items
+  { id: "w-lion", cat: "animals", name: "Lion", emoji: "🦁", sub: "Apex Predator", score: "99.1%", loc: "Nairobi", tags: ["Mane", "Feline", "Savanna"] },
+  { id: "w-sushi", cat: "food", name: "Sushi", emoji: "🍣", sub: "Japanese Cuisine", score: "99.4%", loc: "Osaka", tags: ["Nori", "Fish Slice", "Rice Base"] },
+  { id: "w-headphones", cat: "tech", name: "Headphones", emoji: "🎧", sub: "Audio Gear", score: "98.2%", loc: "Berlin", tags: ["Over-Ear Cups", "Headband", "Cushion"] },
+  { id: "w-scooter", cat: "vehicles", name: "E-Scooter", emoji: "🛵", sub: "Urban Moped", score: "97.9%", loc: "Taipei", tags: ["Footboard", "Headlight", "Battery"] },
+  { id: "w-student", cat: "humans", name: "Student", emoji: "🧒", sub: "Young Learner", score: "98.1%", loc: "Toronto", tags: ["Backpack", "School Uniform", "Walking"] },
+  { id: "w-tennis", cat: "sports", name: "Tennis Ball", emoji: "🎾", sub: "Felt Ball", score: "99.4%", loc: "Wimbledon", tags: ["Neon Felt", "Curved Seam", "Rubber"] },
+  { id: "w-volcano", cat: "nature", name: "Volcano", emoji: "🌋", sub: "Geological Peak", score: "99.0%", loc: "Reykjavik", tags: ["Caldera", "Slope", "Crater"] },
+  { id: "w-sunglasses", cat: "objects", name: "Sunglasses", emoji: "🕶️", sub: "Tinted Eyewear", score: "97.5%", loc: "Los Angeles", tags: ["Dual Lenses", "Frames", "Bridge"] },
+  { id: "w-elephant", cat: "animals", name: "Elephant", emoji: "🐘", sub: "Wild Mammal", score: "99.7%", loc: "New Delhi", tags: ["Trunk", "Tusks", "Ears"] },
+  { id: "w-avocado", cat: "food", name: "Avocado", emoji: "🥑", sub: "Fresh Fruit", score: "97.8%", loc: "Mexico City", tags: ["Green Flesh", "Seed Center", "Pear Shape"] },
+  { id: "w-camera", cat: "tech", name: "Camera", emoji: "📷", sub: "Optical DSLR", score: "98.7%", loc: "Kyoto", tags: ["Lens Ring", "Shutter Button", "Flash"] },
+  { id: "w-plane", cat: "vehicles", name: "Airplane", emoji: "✈️", sub: "Commercial Jet", score: "99.7%", loc: "Paris", tags: ["Wingspan", "Turbines", "Tail Rudder"] },
+  { id: "w-doctor", cat: "humans", name: "Doctor", emoji: "🧑‍⚕️", sub: "Healthcare Staff", score: "99.0%", loc: "Geneva", tags: ["Lab Coat", "Stethoscope", "Scrubs"] },
+  { id: "w-guitar", cat: "sports", name: "Guitar", emoji: "🎸", sub: "String Instrument", score: "98.8%", loc: "Nashville", tags: ["Fretboard", "Body", "Strings"] },
+  { id: "w-ocean", cat: "nature", name: "Ocean Wave", emoji: "🌊", sub: "Hydraulic Wave", score: "98.6%", loc: "Honolulu", tags: ["Foam Crest", "Barrel", "Curl"] },
+  { id: "w-books", cat: "objects", name: "Library Books", emoji: "📚", sub: "Bound Volumes", score: "99.2%", loc: "Oxford", tags: ["Spines", "Hardcover", "Paper"] },
+
+  // Column 3 Items
+  { id: "w-dolphin", cat: "animals", name: "Dolphin", emoji: "🐬", sub: "Marine Mammal", score: "98.5%", loc: "Sydney", tags: ["Dorsal Fin", "Aquatic", "Bottle Snout"] },
+  { id: "w-coffee", cat: "food", name: "Coffee", emoji: "☕", sub: "Hot Beverage", score: "99.1%", loc: "Milan", tags: ["Ceramic Cup", "Steam", "Saucer"] },
+  { id: "w-drone", cat: "tech", name: "Quadcopter", emoji: "🛸", sub: "Aerial Drone", score: "99.0%", loc: "Shenzhen", tags: ["4 Rotors", "Gimbal Lens", "Sensors"] },
+  { id: "w-rocket", cat: "vehicles", name: "Space Rocket", emoji: "🚀", sub: "Orbital Booster", score: "99.8%", loc: "Cape Canaveral", tags: ["Fairing", "Thrusters", "Nozzle"] },
+  { id: "w-astronaut", cat: "humans", name: "Astronaut", emoji: "👨‍🚀", sub: "Space Explorer", score: "99.6%", loc: "Houston", tags: ["Helmet Visor", "EVA Suit", "Gloves"] },
+  { id: "w-piano", cat: "sports", name: "Piano", emoji: "🎹", sub: "Keyboard Keys", score: "99.3%", loc: "Vienna", tags: ["Black/White Keys", "Ivory", "Octaves"] },
+  { id: "w-mountain", cat: "nature", name: "Mountain", emoji: "🏔️", sub: "Alpine Peak", score: "99.5%", loc: "Zermatt", tags: ["Snow Ridge", "Rock Face", "Summit"] },
+  { id: "w-traffic", cat: "objects", name: "Traffic Signal", emoji: "🚦", sub: "Street Light", score: "99.8%", loc: "Singapore", tags: ["Red/Yellow/Green", "Housing", "Lens"] },
+  { id: "w-panda", cat: "animals", name: "Panda", emoji: "🐼", sub: "Giant Panda", score: "99.6%", loc: "Chengdu", tags: ["Bicolor", "Bear", "Ears"] },
+  { id: "w-icecream", cat: "food", name: "Ice Cream", emoji: "🍦", sub: "Frozen Treat", score: "98.4%", loc: "Naples", tags: ["Waffle Cone", "Swirl", "Cream"] },
+  { id: "w-gamepad", cat: "tech", name: "Game Controller", emoji: "🎮", sub: "Gaming Input", score: "97.6%", loc: "Tokyo", tags: ["Thumbsticks", "D-Pad", "Grip"] },
+  { id: "w-train", cat: "vehicles", name: "Bullet Train", emoji: "🚅", sub: "High-Speed Rail", score: "99.2%", loc: "Nagoya", tags: ["Aerodynamic Nose", "Pantograph", "Windows"] },
+  { id: "w-fox", cat: "animals", name: "Fox", emoji: "🦊", sub: "Wild Vulpes", score: "97.9%", loc: "Oslo", tags: ["Bushy Tail", "Red Fur", "Pointed Ears"] },
+  { id: "w-skateboard", cat: "sports", name: "Skateboard", emoji: "🛹", sub: "Street Board", score: "97.7%", loc: "Venice Beach", tags: ["Deck", "Grip Tape", "4 Trucks/Wheels"] },
+  { id: "w-house", cat: "objects", name: "Suburban House", emoji: "🏠", sub: "Residential Home", score: "98.4%", loc: "Stockholm", tags: ["Gabled Roof", "Windows", "Door"] },
+  { id: "w-tower", cat: "objects", name: "Eiffel Tower", emoji: "🗼", sub: "World Monument", score: "99.9%", loc: "Paris", tags: ["Lattice Iron", "Arches", "Apex"] }
+];
+
+function renderGlobalDataImport() {
+  content.classList.add("no-scroll");
+
+  const primary = state.hero?.primary || "#38bdf8";
+  const secondary = state.hero?.secondary || "#818cf8";
+  const glow = state.hero?.glow || "#38bdf8";
+
+  // Split into 3 columns for vertical stream
+  const col1 = allWorldVisionDataset.filter((_, idx) => idx % 3 === 0);
+  const col2 = allWorldVisionDataset.filter((_, idx) => idx % 3 === 1);
+  const col3 = allWorldVisionDataset.filter((_, idx) => idx % 3 === 2);
+
+  content.innerHTML = `
+    <div class="global-split-page">
+      <!-- Top Bar Inline -->
+      <div class="split-top-bar">
+        <div class="split-title-wrap">
+          <h2>${icon("globe")} Global Vision Ingestion: All Objects & Things in the World</h2>
+          <p>Training Vision AI on every real-world thing: animals, food, tech, vehicles, humans, nature & objects across 180+ cities!</p>
+        </div>
+
+        <div class="stage-nav-bar">
+          <button class="stage-nav-pill" id="nav-step-train">${icon("tag")} 1. Train Fruits</button>
+          <button class="stage-nav-pill" id="nav-step-test">${icon("scan-line")} 2. Test Arena</button>
+          <button class="stage-nav-pill active" id="nav-step-global">${icon("globe")} 3. Global Big Data</button>
+        </div>
+      </div>
+
+      <!-- 50 / 50 Split Layout -->
+      <div class="split-main-grid">
+        <!-- LEFT HALF: Nova Absorbing All Image Data in the World -->
+        <section class="left-nova-panel" aria-label="Nova Absorbing World Data">
+          <div class="nova-stage-header">
+            <span>${icon("radio")} NEURAL INGESTION CORE</span>
+            <div class="absorbing-badge">
+              <span class="absorbing-dot"></span>
+              <span>ABSORBING WORLD DATA</span>
+            </div>
+          </div>
+
+          <!-- Nova Avatar & Orbital Rings Centerpiece -->
+          <div class="nova-avatar-centerpiece">
+            <div class="absorption-rings"></div>
+            <div class="nova-character-wrap">
+              ${renderRoboAvatar(primary, secondary, glow, "NOVA", 2)}
+            </div>
+
+            <!-- Floating Ingestion Badges -->
+            <div class="data-particle-badge dp-1">🌍 180+ Cities</div>
+            <div class="data-particle-badge dp-2">⚡ 1.2M+ Images</div>
+            <div class="data-particle-badge dp-3">🐾 Animals & Food</div>
+            <div class="data-particle-badge dp-4">🚗 Vehicles & People</div>
+          </div>
+
+          <!-- Speech Box -->
+          <div class="nova-speech-card">
+            <div style="font-size:24px;flex-shrink:0;">🧠</div>
+            <p>
+              <strong>Nova is absorbing:</strong> "I am processing all labeled things in the world: animals, food, technology, vehicles, humans, and everyday objects from every continent! My Vision AI now recognizes virtually anything on Earth!"
+            </p>
+          </div>
+
+          <!-- Left Navigation Actions -->
+          <div class="left-actions-row">
+            <button id="back-to-fruits-btn" class="button button-outline" style="font-size:11px;padding:6px 12px;color:#94a3b8;border-color:rgba(255,255,255,0.2);">
+              ${icon("arrow-left")} Fruit Arena
+            </button>
+            <button id="complete-global-step-btn" class="button button-primary" style="background:linear-gradient(135deg,#0284c7,#2563eb);box-shadow:0 0 20px rgba(56,189,248,0.4);font-size:12px;padding:8px 18px;font-weight:800;">
+              <span>Proceed to Unsupervised (Ch 03)</span>${icon("arrow-right")}
+            </button>
+          </div>
+        </section>
+
+        <!-- RIGHT HALF: Vertical Scrolling Streams with Scanning -->
+        <section class="right-stream-panel" aria-label="Vertical Datastream of All Things">
+          <div class="stream-panel-header">
+            <div class="stream-filter-scroll">
+              <button class="cat-filter-btn active" data-filter="all">🌐 All (1.2M)</button>
+              <button class="cat-filter-btn" data-filter="animals">🐾 Animals</button>
+              <button class="cat-filter-btn" data-filter="food">🍕 Food</button>
+              <button class="cat-filter-btn" data-filter="tech">💻 Tech</button>
+              <button class="cat-filter-btn" data-filter="vehicles">🚗 Vehicles</button>
+              <button class="cat-filter-btn" data-filter="humans">🚶 People</button>
+              <button class="cat-filter-btn" data-filter="sports">⚽ Sports</button>
+              <button class="cat-filter-btn" data-filter="nature">🌲 Nature</button>
+              <button class="cat-filter-btn" data-filter="objects">🎒 Objects</button>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;">
+              <button id="stream-boost-btn" class="button button-outline" style="font-size:10px;padding:3px 8px;background:rgba(56,189,248,0.15);border-color:#38bdf8;color:#7dd3fc;">
+                ${icon("zap")} Boost
+              </button>
+              <button id="stream-pause-btn" class="button button-outline" style="font-size:10px;padding:3px 8px;color:#94a3b8;border-color:rgba(255,255,255,0.15);">
+                ${icon("pause")} Pause
+              </button>
+            </div>
+          </div>
+
+          <!-- 3 Vertical Waterfall Columns -->
+          <div class="vertical-waterfall-stage" id="waterfall-stage">
+            <!-- Column 1 (Scrolls Up) -->
+            <div class="vertical-column scroll-up" id="v-col-1">
+              ${col1.concat(col1).map(item => `
+                <div class="vertical-item-card" data-id="${item.id}" data-category="${item.cat}">
+                  <div class="vertical-card-top">
+                    <span class="vertical-card-emoji">${item.emoji}</span>
+                    <div class="vertical-bounding-box">
+                      <div class="vertical-scan-beam"></div>
+                    </div>
+                    <div class="vertical-badge-tag">${item.score}</div>
+                  </div>
+                  <div class="vertical-card-bottom">
+                    <span class="vertical-item-name">${item.name}</span>
+                    <span class="vertical-item-loc">${icon("map-pin")}${item.loc}</span>
+                  </div>
+                </div>
+              `).join("")}
+            </div>
+
+            <!-- Column 2 (Scrolls Down) -->
+            <div class="vertical-column scroll-down" id="v-col-2">
+              ${col2.concat(col2).map(item => `
+                <div class="vertical-item-card" data-id="${item.id}" data-category="${item.cat}">
+                  <div class="vertical-card-top">
+                    <span class="vertical-card-emoji">${item.emoji}</span>
+                    <div class="vertical-bounding-box">
+                      <div class="vertical-scan-beam"></div>
+                    </div>
+                    <div class="vertical-badge-tag">${item.score}</div>
+                  </div>
+                  <div class="vertical-card-bottom">
+                    <span class="vertical-item-name">${item.name}</span>
+                    <span class="vertical-item-loc">${icon("map-pin")}${item.loc}</span>
+                  </div>
+                </div>
+              `).join("")}
+            </div>
+
+            <!-- Column 3 (Scrolls Up) -->
+            <div class="vertical-column scroll-up-2" id="v-col-3">
+              ${col3.concat(col3).map(item => `
+                <div class="vertical-item-card" data-id="${item.id}" data-category="${item.cat}">
+                  <div class="vertical-card-top">
+                    <span class="vertical-card-emoji">${item.emoji}</span>
+                    <div class="vertical-bounding-box">
+                      <div class="vertical-scan-beam"></div>
+                    </div>
+                    <div class="vertical-badge-tag">${item.score}</div>
+                  </div>
+                  <div class="vertical-card-bottom">
+                    <span class="vertical-item-name">${item.name}</span>
+                    <span class="vertical-item-loc">${icon("map-pin")}${item.loc}</span>
+                  </div>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  `;
+
+  refreshIcons();
+
+  // Navigation handlers
+  document.querySelector("#nav-step-train")?.addEventListener("click", () => {
+    content.classList.remove("no-scroll");
+    state.supervisedStage = "train";
+    renderSupervised();
+  });
+  document.querySelector("#nav-step-test")?.addEventListener("click", () => {
+    content.classList.remove("no-scroll");
+    state.supervisedStage = "test";
+    renderSupervised();
+  });
+  document.querySelector("#back-to-fruits-btn")?.addEventListener("click", () => {
+    content.classList.remove("no-scroll");
+    state.supervisedStage = "test";
+    renderSupervised();
+  });
+  document.querySelector("#complete-global-step-btn")?.addEventListener("click", () => {
+    content.classList.remove("no-scroll");
+    playSynthSound("complete");
+    complete("supervised");
+    showNovaUpgradeTransition(2, "unsupervised");
+  });
+
+  // Filter chips
+  let activeFilter = "all";
+  const filterBtns = document.querySelectorAll(".cat-filter-btn");
+  filterBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      filterBtns.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      activeFilter = btn.dataset.filter;
+      playSynthSound("stream");
+
+      const cards = document.querySelectorAll(".vertical-item-card");
+      cards.forEach(card => {
+        if (activeFilter === "all" || card.dataset.category === activeFilter) {
+          card.style.display = "flex";
+          card.style.opacity = "1";
+        } else {
+          card.style.display = "none";
+          card.style.opacity = "0";
+        }
+      });
+    });
+  });
+
+  // Boost stream velocity
+  let boosted = false;
+  const boostBtn = document.querySelector("#stream-boost-btn");
+  boostBtn?.addEventListener("click", () => {
+    boosted = !boosted;
+    playSynthSound("lock");
+    const cols = document.querySelectorAll(".vertical-column");
+    if (boosted) {
+      cols.forEach(c => c.style.animationDuration = "14s");
+      boostBtn.innerHTML = `${icon("zap")} Turbo`;
+      boostBtn.style.background = "rgba(34,197,94,0.2)";
+      boostBtn.style.borderColor = "#22c55e";
+    } else {
+      cols[0].style.animationDuration = "36s";
+      cols[1].style.animationDuration = "34s";
+      cols[2].style.animationDuration = "38s";
+      boostBtn.innerHTML = `${icon("zap")} Boost`;
+      boostBtn.style.background = "rgba(56,189,248,0.15)";
+      boostBtn.style.borderColor = "#38bdf8";
+    }
+    refreshIcons();
+  });
+
+  // Pause stream
+  let paused = false;
+  const pauseBtn = document.querySelector("#stream-pause-btn");
+  pauseBtn?.addEventListener("click", () => {
+    paused = !paused;
+    const cols = document.querySelectorAll(".vertical-column");
+    if (paused) {
+      cols.forEach(c => c.style.animationPlayState = "paused");
+      pauseBtn.innerHTML = `${icon("play")} Resume`;
+    } else {
+      cols.forEach(c => c.style.animationPlayState = "running");
+      pauseBtn.innerHTML = `${icon("pause")} Pause`;
+    }
+    refreshIcons();
+  });
+
+  // Card click modal
+  const cards = document.querySelectorAll(".vertical-item-card");
+  cards.forEach(card => {
+    card.addEventListener("click", () => {
+      const item = allWorldVisionDataset.find(d => d.id === card.dataset.id);
+      if (!item) return;
+      playSynthSound("lock");
+      showAllWorldCardModal(item);
+    });
+  });
+}
+
+function showAllWorldCardModal(item) {
+  let modal = document.querySelector("#global-inspect-modal");
+  if (!modal) {
+    modal = document.createElement("div");
+    modal.id = "global-inspect-modal";
+    modal.className = "card-inspect-modal";
+    document.body.appendChild(modal);
+  }
+
+  modal.innerHTML = `
+    <div class="inspect-card-dialog">
+      <button class="modal-close-btn" id="close-inspect-dialog" style="position:absolute;top:14px;right:14px;background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:18px;">
+        ${icon("x")}
+      </button>
+
+      <div style="display:flex;align-items:center;gap:8px;color:#38bdf8;font-size:11px;font-weight:800;letter-spacing:0.08em;">
+        ${icon("scan")} COMPUTER VISION DETECTED OBJECT
+      </div>
+
+      <div style="display:grid;grid-template-columns:140px 1fr;gap:16px;align-items:center;">
+        <div style="height:120px;background:radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.15), rgba(15, 23, 42, 0.95));border:1px solid rgba(56,189,248,0.4);border-radius:10px;display:grid;place-items:center;position:relative;">
+          <span style="font-size:52px;line-height:1;">${item.emoji}</span>
+          <div class="vertical-bounding-box" style="inset:6px;border-color:#38bdf8;">
+            <div class="vertical-scan-beam"></div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <h3 style="margin:0;color:#ffffff;font-size:18px;display:flex;align-items:center;gap:8px;">
+            <span>${item.name}</span>
+            <span style="font-size:11px;background:#0284c7;color:#fff;padding:2px 7px;border-radius:4px;">${item.score}</span>
+          </h3>
+          <p style="margin:0;color:#7dd3fc;font-size:12px;">${item.sub} • ${icon("map-pin")} ${item.loc} Hub</p>
+
+          <div>
+            <div style="font-size:10px;font-weight:800;color:#94a3b8;margin-bottom:4px;">NEURAL FEATURE MAPS</div>
+            <div style="display:flex;gap:5px;flex-wrap:wrap;">
+              ${item.tags.map(t => `<span style="background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.3);color:#bae6fd;font-size:10.5px;padding:2px 7px;border-radius:5px;">${t}</span>`).join("")}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:rgba(2,132,199,0.1);border:1px solid rgba(56,189,248,0.25);border-radius:8px;padding:10px 12px;color:#cbd5e1;font-size:11.5px;line-height:1.4;">
+        <strong>Worldwide Data Rule:</strong> In Supervised Learning, humans provide labeled photos for thousands of object classes. The vision model extracts geometry, edges, and texture maps so it can detect that object anywhere in the world!
+      </div>
+    </div>
+  `;
+
+  modal.style.display = "grid";
+  refreshIcons();
+
+  modal.querySelector("#close-inspect-dialog")?.addEventListener("click", () => {
+    modal.style.display = "none";
+  });
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) modal.style.display = "none";
+  });
 }
 
 /* ==============================================
@@ -2093,76 +2622,201 @@ function renderUnsupervisedTest() {
   content.innerHTML = `
     ${header("CHAPTER 03 // UNSUPERVISED LEARNING", "Audio clustered into 2 baskets & Mystery Testing.", "Without human labels, your AI discovered 2 natural sound clusters. Audio 01 & 03 fell into Basket 1, while Audio 02 & 04 fell into Basket 2. Tap any audio button to play its sound!", "03")}
     
-    <div class="training-complete-banner" style="border-color:#bd7aff;background:linear-gradient(135deg, rgba(189, 122, 255, 0.2), rgba(99, 102, 241, 0.28));box-shadow:0 0 28px rgba(189, 122, 255, 0.3), inset 0 0 16px rgba(189, 122, 255, 0.12);">
+    <!-- Modern Cyber Holographic Banner -->
+    <div class="unsupervised-hero-banner">
+      <div class="banner-glow-orb"></div>
       <div class="banner-left">
-        <span class="banner-badge-icon">🎉</span>
-        <div>
-          <div class="banner-title" style="color:#e5bfff;">${icon("layers")} Unsupervised Clustering is Completed!</div>
-          <p class="banner-subtitle"><strong>Nova</strong> discovered 2 natural baskets and is ready to test!</p>
+        <div class="banner-status-badge">
+          <span class="status-pulse-dot"></span>
+          <span>CLUSTERING ENGINE ACTIVE</span>
         </div>
+        <h3 class="banner-headline">
+          <span class="gradient-text">2 Natural Sound Clusters Discovered!</span>
+        </h3>
+        <p class="banner-subtext">Nova analyzed raw audio frequencies without any human supervision or labels, grouping them into two acoustic resonance pods.</p>
       </div>
-      <button id="recluster-unsupervised-btn" class="button button-outline" style="font-size:11px;padding:6px 14px;background:rgba(255,255,255,0.08);border-radius:8px;border:1px solid rgba(255,255,255,0.25);color:#cbd9ef;white-space:nowrap;">${icon("refresh-cw")} Re-cluster Unlabeled Audio</button>
+      <div class="banner-actions">
+        <button id="recluster-unsupervised-btn" class="modern-recluster-btn" aria-label="Re-cluster Unlabeled Audio">
+          ${icon("refresh-cw")}
+          <span>Re-cluster Audio</span>
+        </button>
+      </div>
     </div>
 
-    <!-- Top: 2 Discovered Baskets -->
-    <div class="baskets-stage" style="margin-bottom: 24px;">
-      <div id="basket-1" class="basket-box basket-1">
-        <div class="basket-icon-big">🧺</div>
-        <h4 class="basket-title">Basket 1</h4>
-        <p class="basket-desc">High Pitch / Melodic Chirps (Tap to play)</p>
-        <div class="basket-contents" id="basket-1-items">
-          <button class="basket-item-card animate-drop" data-audio="/sounds/bird-sounds/1.mp3" aria-label="Play Audio Sample 01">
-            <span>🎵 Audio Sample 01</span>
-            <span style="display:inline-flex;align-items:center;gap:5px;color:#7eedff;font-size:11px;">${icon("play")} High Pitch</span>
+    <!-- Top: 2 Discovered Acoustic Pods (Baskets) -->
+    <div class="baskets-stage modern-baskets-stage">
+      <!-- Basket 1: High Frequency Cluster -->
+      <div id="basket-1" class="basket-box modern-pod pod-high-freq">
+        <div class="pod-header">
+          <div class="pod-badge-wrap">
+            <span class="pod-badge">POD 01 • HIGH SPECTRUM</span>
+            <span class="freq-tag">2kHz – 8kHz</span>
+          </div>
+          <div class="pod-icon-wrap">
+            <div class="waveform-mini-orb cyan-orb" aria-hidden="true">
+              <span class="orb-bar bar-1"></span>
+              <span class="orb-bar bar-2"></span>
+              <span class="orb-bar bar-3"></span>
+              <span class="orb-bar bar-4"></span>
+              <span class="orb-bar bar-5"></span>
+            </div>
+          </div>
+          <h4 class="pod-title">Basket 1: Melodic Chirps</h4>
+          <p class="pod-desc">High Pitch / Rapid Oscillations (Tap card to play)</p>
+        </div>
+        
+        <div class="basket-contents pod-contents" id="basket-1-items">
+          <button class="basket-item-card modern-audio-chip animate-drop" data-audio="/sounds/bird-sounds/1.mp3" aria-label="Play Audio Sample 01">
+            <div class="audio-chip-left">
+              <span class="audio-play-disc">${icon("play")}</span>
+              <div class="audio-chip-meta">
+                <strong class="audio-chip-title">Audio Sample 01</strong>
+                <span class="audio-chip-sub">Melodic Chirp #1</span>
+              </div>
+            </div>
+            <div class="audio-chip-right">
+              <div class="eq-bars">
+                <span></span><span></span><span></span><span></span>
+              </div>
+              <span class="tag-high-pitch">High Pitch</span>
+            </div>
             ${audioTag({ audio: "/sounds/bird-sounds/1.mp3" })}
           </button>
-          <button class="basket-item-card animate-drop" data-audio="/sounds/bird-sounds/2.mp3" style="animation-delay: 0.15s;" aria-label="Play Audio Sample 03">
-            <span>🎵 Audio Sample 03</span>
-            <span style="display:inline-flex;align-items:center;gap:5px;color:#7eedff;font-size:11px;">${icon("play")} Chirp Tone</span>
+
+          <button class="basket-item-card modern-audio-chip animate-drop" data-audio="/sounds/bird-sounds/2.mp3" style="animation-delay: 0.15s;" aria-label="Play Audio Sample 03">
+            <div class="audio-chip-left">
+              <span class="audio-play-disc">${icon("play")}</span>
+              <div class="audio-chip-meta">
+                <strong class="audio-chip-title">Audio Sample 03</strong>
+                <span class="audio-chip-sub">Birdsong Trill</span>
+              </div>
+            </div>
+            <div class="audio-chip-right">
+              <div class="eq-bars">
+                <span></span><span></span><span></span><span></span>
+              </div>
+              <span class="tag-high-pitch">Chirp Tone</span>
+            </div>
             ${audioTag({ audio: "/sounds/bird-sounds/2.mp3" })}
           </button>
         </div>
       </div>
 
-      <div id="basket-2" class="basket-box basket-2">
-        <div class="basket-icon-big">🧺</div>
-        <h4 class="basket-title">Basket 2</h4>
-        <p class="basket-desc">Low Frequency / Rhythm Beats (Tap to play)</p>
-        <div class="basket-contents" id="basket-2-items">
-          <button class="basket-item-card animate-drop" data-audio="/sounds/drums-sounds/1.mp3" aria-label="Play Audio Sample 02">
-            <span>🎵 Audio Sample 02</span>
-            <span style="display:inline-flex;align-items:center;gap:5px;color:#ffb26b;font-size:11px;">${icon("play")} Percussion</span>
+      <!-- Basket 2: Low Frequency Cluster -->
+      <div id="basket-2" class="basket-box modern-pod pod-low-freq">
+        <div class="pod-header">
+          <div class="pod-badge-wrap">
+            <span class="pod-badge">POD 02 • LOW SPECTRUM</span>
+            <span class="freq-tag">60Hz – 250Hz</span>
+          </div>
+          <div class="pod-icon-wrap">
+            <div class="waveform-mini-orb amber-orb" aria-hidden="true">
+              <span class="orb-bar bar-1"></span>
+              <span class="orb-bar bar-2"></span>
+              <span class="orb-bar bar-3"></span>
+              <span class="orb-bar bar-4"></span>
+              <span class="orb-bar bar-5"></span>
+            </div>
+          </div>
+          <h4 class="pod-title">Basket 2: Rhythm Beats</h4>
+          <p class="pod-desc">Low Frequency / Acoustic Cadence (Tap card to play)</p>
+        </div>
+        
+        <div class="basket-contents pod-contents" id="basket-2-items">
+          <button class="basket-item-card modern-audio-chip animate-drop" data-audio="/sounds/drums-sounds/1.mp3" aria-label="Play Audio Sample 02">
+            <div class="audio-chip-left">
+              <span class="audio-play-disc">${icon("play")}</span>
+              <div class="audio-chip-meta">
+                <strong class="audio-chip-title">Audio Sample 02</strong>
+                <span class="audio-chip-sub">Kick Transient</span>
+              </div>
+            </div>
+            <div class="audio-chip-right">
+              <div class="eq-bars">
+                <span></span><span></span><span></span><span></span>
+              </div>
+              <span class="tag-low-beat">Percussion</span>
+            </div>
             ${audioTag({ audio: "/sounds/drums-sounds/1.mp3" })}
           </button>
-          <button class="basket-item-card animate-drop" data-audio="/sounds/drums-sounds/2.mp3" style="animation-delay: 0.15s;" aria-label="Play Audio Sample 04">
-            <span>🎵 Audio Sample 04</span>
-            <span style="display:inline-flex;align-items:center;gap:5px;color:#ffb26b;font-size:11px;">${icon("play")} Rhythm Beat</span>
+
+          <button class="basket-item-card modern-audio-chip animate-drop" data-audio="/sounds/drums-sounds/2.mp3" style="animation-delay: 0.15s;" aria-label="Play Audio Sample 04">
+            <div class="audio-chip-left">
+              <span class="audio-play-disc">${icon("play")}</span>
+              <div class="audio-chip-meta">
+                <strong class="audio-chip-title">Audio Sample 04</strong>
+                <span class="audio-chip-sub">Snare & Cymbal Beat</span>
+              </div>
+            </div>
+            <div class="audio-chip-right">
+              <div class="eq-bars">
+                <span></span><span></span><span></span><span></span>
+              </div>
+              <span class="tag-low-beat">Rhythm Beat</span>
+            </div>
             ${audioTag({ audio: "/sounds/drums-sounds/2.mp3" })}
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Bottom: Mystery Testing Station -->
-    <div class="inspection-layout" style="margin-top:16px;">
-      <section class="inspection-station">
-        <div class="inspection-topline"><span>${icon("music")} MYSTERY SOUND TESTING</span><small>2 UNSEEN AUDIO FILES</small></div>
-        <p style="font-size:12px;color:#a0b8d8;margin:10px 0 14px;">Click on each mystery sound file to listen and watch your AI place it into its matching basket!</p>
+    <!-- Bottom: Mystery Testing Station & Insight Panel -->
+    <div class="inspection-layout modern-inspection-layout" style="margin-top:16px;">
+      <!-- Left: Mystery Testing Station -->
+      <section class="inspection-station modern-station-card">
+        <div class="inspection-topline modern-topline">
+          <div class="topline-left">
+            <span class="station-icon-glow">${icon("music")}</span>
+            <span class="station-heading">MYSTERY SOUND TESTING STATION</span>
+          </div>
+          <span class="station-badge">2 UNSEEN AUDIO SAMPLES</span>
+        </div>
+        <p class="station-desc">Click <strong>Listen Clip</strong> to hear the unknown waveform, then tap <strong>Place in Basket</strong> to watch Nova classify it without human labels!</p>
         
-        <div class="mystery-test-grid">
+        <div class="mystery-test-grid modern-mystery-grid">
           ${unsupervisedMysteryTests.map((card, idx) => `
-            <div id="mystery-card-${card.id}" class="mystery-test-card">
-              <div style="display:flex;align-items:center;justify-content:space-between;">
-                <strong>${card.label}</strong>
-                <span class="badge" style="font-size:10px;padding:3px 7px;">Unseen Audio</span>
+            <div id="mystery-card-${card.id}" class="mystery-test-card modern-mystery-card">
+              <div class="mystery-card-header">
+                <div class="mystery-title-wrap">
+                  <span class="mystery-badge-code">SAMPLE // 0${idx + 1}</span>
+                  <strong class="mystery-title">${card.label}</strong>
+                </div>
+                <span class="unseen-pill">
+                  <span class="live-pulse"></span>
+                  Unseen Audio
+                </span>
               </div>
-              <p style="font-size:11px;color:#8ba6cb;margin:0;">Listen to wave pattern and ask AI to classify.</p>
-              <div style="display:flex;gap:8px;">
-                <button class="button button-outline play-mystery-btn" data-mystery-id="${card.id}" style="flex:1;font-size:11px;padding:6px 10px;">
-                  ${icon("play")} Listen Clip
+
+              <!-- Oscilloscope Waveform Track -->
+              <div class="mystery-visualizer-box">
+                <div class="oscilloscope-track">
+                  <div class="osc-bar" style="--h: 35%;"></div>
+                  <div class="osc-bar" style="--h: 65%;"></div>
+                  <div class="osc-bar" style="--h: 90%;"></div>
+                  <div class="osc-bar" style="--h: 45%;"></div>
+                  <div class="osc-bar" style="--h: 80%;"></div>
+                  <div class="osc-bar" style="--h: 100%;"></div>
+                  <div class="osc-bar" style="--h: 70%;"></div>
+                  <div class="osc-bar" style="--h: 40%;"></div>
+                  <div class="osc-bar" style="--h: 85%;"></div>
+                  <div class="osc-bar" style="--h: 55%;"></div>
+                  <div class="osc-bar" style="--h: 95%;"></div>
+                  <div class="osc-bar" style="--h: 30%;"></div>
+                  <div class="osc-bar" style="--h: 60%;"></div>
+                  <div class="osc-bar" style="--h: 75%;"></div>
+                </div>
+                <span class="osc-tag">RAW FREQUENCY TRANSIENTS</span>
+              </div>
+
+              <p class="mystery-card-desc">Waveform patterns unanalyzed. Nova will evaluate frequency spectrum and cadence.</p>
+
+              <div class="mystery-actions">
+                <button class="button button-outline play-mystery-btn modern-listen-btn" data-mystery-id="${card.id}">
+                  <span class="btn-sound-anim">${icon("play")}</span>
+                  <span>Listen Clip</span>
                 </button>
-                <button class="button button-primary place-mystery-btn" data-mystery-id="${card.id}" style="flex:1.4;font-size:11px;padding:6px 10px;">
-                  ${icon("arrow-down-right")} Place in Basket
+                <button class="button button-primary place-mystery-btn modern-place-btn" data-mystery-id="${card.id}">
+                  <span>${icon("arrow-down-right")} Place in Basket</span>
                 </button>
               </div>
               ${audioTag(card)}
@@ -2171,21 +2825,32 @@ function renderUnsupervisedTest() {
         </div>
       </section>
 
-      <aside class="analysis-panel">
-        <p class="kicker">UNSUPERVISED CLUSTERING INSIGHT</p>
+      <!-- Right: AI Insight Panel -->
+      <aside class="analysis-panel modern-analysis-card">
+        <div class="analysis-topline">
+          <p class="kicker modern-kicker">${icon("sparkles")} UNSUPERVISED CLUSTERING INSIGHT</p>
+          <span class="ai-status-indicator"><i class="status-dot"></i> Neural Core Active</span>
+        </div>
+
         <div id="unsupervised-result-box" style="margin-bottom:14px;">
-          <div class="analysis-empty">
-            ${icon("sparkles")}
-            <h3>Audio Clustered</h3>
-            <p>Audio 01 & 03 are grouped in Basket 1. Audio 02 & 04 are grouped in Basket 2. Tap the mystery files on the left to see where each new sound falls!</p>
+          <div class="analysis-empty modern-insight-empty">
+            <div class="empty-sparkle-orb">
+              ${renderRoboAvatar("#ffbd61", "#ed5c88", "#9effee", "NOVA")}
+            </div>
+            <h3>Pattern Discovery Active</h3>
+            <p>Nova clustered Audio 01 & 03 into Basket 1 (High Pitch) and Audio 02 & 04 into Basket 2 (Low Rhythm).</p>
+            <div class="empty-instruction-chip">
+              ${icon("music")}
+              <span>Test the mystery files on the left to see which basket Nova routes each unseen sound into!</span>
+            </div>
           </div>
         </div>
 
         <div class="supervised-learning-section">
-          <button id="unsupervised-learning-btn" class="button-unsupervised" type="button" aria-label="Learn about Unsupervised Learning">
+          <button id="unsupervised-learning-btn" class="button-unsupervised modern-unsupervised-btn" type="button" aria-label="Learn about Unsupervised Learning">
             <span class="supervised-tag">${icon("sparkles")} AI LEARNING METHOD</span>
-            <strong class="supervised-title">UNSUPERVISED LEARNING</strong>
-            <span class="supervised-hint" style="color:#d7a8ff;">${icon("help-circle")} What is Unsupervised Learning? Tap to learn</span>
+            <strong class="supervised-title">WHAT IS UNSUPERVISED LEARNING?</strong>
+            <span class="supervised-hint" style="color:#d7a8ff;">${icon("help-circle")} Tap to discover how AI clusters without answers</span>
           </button>
         </div>
       </aside>
@@ -2212,7 +2877,17 @@ function renderUnsupervisedTest() {
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
       const mystery = mysteryById.get(btn.dataset.mysteryId);
-      if (mystery) playClip(mystery);
+      if (mystery) {
+        playClip(mystery);
+        const card = btn.closest(".mystery-test-card");
+        if (card) {
+          card.classList.add("playing-audio");
+          const audio = card.querySelector("audio");
+          if (audio) {
+            audio.onended = () => card.classList.remove("playing-audio");
+          }
+        }
+      }
     });
   });
 
@@ -2238,7 +2913,7 @@ function renderUnsupervisedTest() {
 
       window.setTimeout(() => {
         playEurekaSound();
-        const basketName = mystery.targetBasket === "basket-1" ? "Basket 1 (High Pitch / Chirps)" : "Basket 2 (Low Frequency / Beats)";
+        const basketName = mystery.targetBasket === "basket-1" ? "Basket 1 (High Pitch / Melodic Chirps)" : "Basket 2 (Low Frequency / Rhythm Beats)";
         const shortBasketName = mystery.targetBasket === "basket-1" ? "Basket 1" : "Basket 2";
         btn.innerHTML = `<span>${icon("badge-check")} Placed in ${shortBasketName}</span>`;
         const cardBox = document.querySelector(`#mystery-card-${mystery.id}`);
@@ -2251,32 +2926,56 @@ function renderUnsupervisedTest() {
         const basketItemsContainer = document.querySelector(`#${mystery.targetBasket}-items`);
         if (basketItemsContainer) {
           const itemEl = document.createElement("button");
-          itemEl.className = "basket-item-card animate-drop mystery-item";
+          itemEl.className = "basket-item-card modern-audio-chip animate-drop mystery-item";
           itemEl.dataset.audio = mystery.audio;
-          itemEl.innerHTML = `<span>⭐ <strong>${mystery.label}</strong></span><span style="display:inline-flex;align-items:center;gap:5px;color:#ffd166;font-size:11px;">${icon("play")} ${mystery.similarity}% match</span>${audioTag(mystery)}`;
+          itemEl.innerHTML = `
+            <div class="audio-chip-left">
+              <span class="audio-play-disc gold-disc">${icon("play")}</span>
+              <div class="audio-chip-meta">
+                <strong class="audio-chip-title">⭐ ${mystery.label}</strong>
+                <span class="audio-chip-sub">Classified Unseen Sound</span>
+              </div>
+            </div>
+            <div class="audio-chip-right">
+              <div class="eq-bars gold-eq">
+                <span></span><span></span><span></span><span></span>
+              </div>
+              <span class="tag-match-score">${mystery.similarity}% match</span>
+            </div>
+            ${audioTag(mystery)}
+          `;
           itemEl.addEventListener("click", () => playClip({ audio: mystery.audio }));
           basketItemsContainer.appendChild(itemEl);
+          refreshIcons();
         }
 
         if (resultBox) {
-          resultBox.className = "analysis-result";
-          const reasonItems = mystery.reasons.map((r) => `<li>${icon("sparkles")}<span>${r}</span></li>`).join("");
+          resultBox.className = "analysis-result modern-result-box";
+          const reasonItems = mystery.reasons.map((r) => `<li><span class="reason-check">${icon("check-circle-2")}</span><span>${r}</span></li>`).join("");
           resultBox.innerHTML = `
-            <div class="unsupervised-prediction-banner">
-              <span class="cluster-tag">${icon("sparkles")} UNSUPERVISED CLUSTER MATCH</span>
-              <strong>Placed into ${basketName}!</strong>
-              <b>⭐ ${mystery.similarity}% frequency match</b>
+            <div class="unsupervised-prediction-banner modern-prediction-banner">
+              <div class="banner-chip">${icon("sparkles")} UNSUPERVISED CLUSTER MATCH</div>
+              <strong class="banner-basket-name">Placed into ${basketName}!</strong>
+              <div class="banner-score-pill">
+                <span class="score-star">⭐</span>
+                <span>${mystery.similarity}% Frequency & Waveform Match</span>
+              </div>
             </div>
-            <h3 style="margin-top:14px;">Why AI placed it in this basket</h3>
-            <ul class="reason-list">${reasonItems}</ul>
-            <div class="finding" style="border-color:#ffd166;background:rgba(255,209,102,0.12);color:#fff6db;margin-top:12px;">
-              ${icon("lightbulb")}
-              <span><strong>Clustering Insight:</strong> Nova grouped this sound based on shared waveform physics—completely unsupervised without labels! Tap its card above to listen anytime.</span>
-            </div>
-            <div style="margin-top:16px;padding-top:14px;border-top:1px dashed rgba(67,119,183,0.25);">
-              <button id="goto-generative-btn" class="button button-primary" style="width:100%;">
-                <span>Proceed to Generative AI (Ch 04)</span>${icon("arrow-right")}
-              </button>
+            <div class="result-details-body">
+              <h4 class="reasons-heading">${icon("layers")} Why Nova placed it in this basket:</h4>
+              <ul class="reason-list modern-reason-list">${reasonItems}</ul>
+              <div class="finding modern-finding">
+                <div class="finding-icon-wrap">${icon("lightbulb")}</div>
+                <div>
+                  <strong>Clustering Insight:</strong>
+                  <span>Nova grouped this sound based on shared physical waveform properties (frequency oscillations and cadence) — completely unsupervised without any human labels!</span>
+                </div>
+              </div>
+              <div class="proceed-action-wrap" style="margin-top:14px;padding-top:12px;border-top:1px dashed rgba(67,119,183,0.25);">
+                <button id="goto-generative-btn" class="button button-primary modern-proceed-btn" style="width:100%;">
+                  <span>Proceed to Generative AI (Ch 04)</span>${icon("arrow-right")}
+                </button>
+              </div>
             </div>
           `;
 
@@ -2342,143 +3041,414 @@ function showUnsupervisedModal() {
 }
 
 function renderGenerative() {
+  state.generativeStage = state.generativeStage || "books";
+
+  if (state.generativeStage === "prompt") {
+    renderGenerativePromptStage();
+  } else {
+    renderGenerativeBooksStage();
+  }
+}
+
+function renderGenerativeBooksStage() {
+  content.innerHTML = `
+    ${header("CHAPTER 04 // GENERATIVE AI", "Step 1: Pre-training — Read & Scan Books", "Generative AI doesn't create from nothing. First, it reads and scans books to learn grammar, vocabulary, and how stories are structured.", "04")}
+
+    <!-- Digital Library Stage -->
+    <div class="genai-pretrain-layout">
+      <!-- Left: Library Books Bunch -->
+      <section class="genai-library-section">
+        <div class="inspection-topline modern-topline">
+          <div class="topline-left">
+            <span class="station-icon-glow">${icon("book-open")}</span>
+            <span class="station-heading">FOUNDATIONAL KNOWLEDGE LIBRARY</span>
+          </div>
+          <span class="station-badge">WORLD BOOKS COLLECTION</span>
+        </div>
+        <p class="station-desc">Before asking Nova to create a story, we give it a bunch of books to read and scan!</p>
+
+        <!-- Big Books Bunch Stage with Laser Scanning Frame -->
+        <div class="genai-books-stage" id="genai-books-stage">
+          <div class="book-scanner-laser" id="book-scanner-laser"></div>
+          
+          <div class="big-books-bunch-container">
+            <div class="books-bunch-cluster">
+              <span class="big-book-emoji b-orbit b-1" aria-hidden="true">📖</span>
+              <span class="big-book-emoji b-orbit b-2" aria-hidden="true">📕</span>
+              <span class="big-book-emoji b-main" aria-hidden="true">📚</span>
+              <span class="big-book-emoji b-orbit b-3" aria-hidden="true">📗</span>
+              <span class="big-book-emoji b-orbit b-4" aria-hidden="true">📘</span>
+              <span class="big-book-emoji b-orbit b-5" aria-hidden="true">📙</span>
+            </div>
+            <div class="books-bunch-caption">
+              <h3 class="bunch-title">Library of World Books</h3>
+              <p class="bunch-subtitle">Stories, encyclopedias, fairy tales, history & sciences from all over the world</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="genai-action-bar">
+          <button id="scan-books-btn" class="button button-primary genai-scan-btn">
+            <span class="btn-icon-wrap">${icon("book-marked")}</span>
+            <span id="scan-btn-label">${state.generativeBooksScanned ? "Re-scan Books" : "Feed Books to Nova & Start Scanning"}</span>
+          </button>
+          <p id="scan-help-caption" class="genai-scan-caption">
+            ${state.generativeBooksScanned ? "✨ Books scanned and learned! Click below to give Nova 4 sentences." : "Click to activate Nova's high-speed laser scanner across the books."}
+          </p>
+        </div>
+      </section>
+
+      <!-- Right: Nova Neural Telemetry & Status -->
+      <aside class="analysis-panel genai-status-panel">
+        <div class="analysis-topline">
+          <p class="kicker modern-kicker">${icon("cpu")} NOVA'S READING ENGINE</p>
+          <span class="ai-status-indicator" id="reading-status-dot">
+            <i class="status-dot"></i> ${state.generativeBooksScanned ? "Ready for Story Prompt" : "Waiting for Books"}
+          </span>
+        </div>
+
+        <div id="genai-books-result-box" class="genai-books-result">
+          ${state.generativeBooksScanned ? `
+            <div class="books-complete-card">
+              <div class="complete-badge-ring">
+                <span class="complete-emoji">🎉</span>
+              </div>
+              <h3 class="complete-heading">Ready! Book Scanning is Completed!</h3>
+              <p class="complete-copy">Nova has successfully read and scanned the <strong>bunch of books</strong>. It has learned language, vocabulary, grammar, and storytelling patterns!</p>
+              
+              <div class="learned-capabilities-list">
+                <div class="cap-item"><span>📘</span> <strong>World Facts & Physics:</strong> Ponds, rain, and mud</div>
+                <div class="cap-item"><span>📖</span> <strong>Narrative Arc:</strong> Crisis, teamwork & rescue</div>
+                <div class="cap-item"><span>✍️</span> <strong>Grammar & Syntax:</strong> Fluent sentence transitions</div>
+              </div>
+
+              <div class="goto-prompt-wrap">
+                <button id="proceed-to-prompt-btn" class="button button-primary proceed-prompt-btn">
+                  <span>Now Give 4 Sentences to Create a Story</span>${icon("arrow-right")}
+                </button>
+              </div>
+            </div>
+          ` : `
+            <div class="analysis-empty books-empty-state">
+              <div class="empty-sparkle-orb">
+                ${renderRoboAvatar("#ffbd61", "#ed5c88", "#9effee", "NOVA")}
+              </div>
+              <h3>Books Awaiting Ingestion</h3>
+              <p>Generative AI requires reading books (Pre-training) before creating stories. Click <strong>"Feed Books to Nova & Start Scanning"</strong> to begin!</p>
+              <div class="empty-instruction-chip">
+                ${icon("book-open")}
+                <span>Bunch of books ready to be scanned into Nova's neural core.</span>
+              </div>
+            </div>
+          `}
+        </div>
+
+        <div class="genai-pedagogy-tip">
+          <div class="tip-icon">${icon("lightbulb")}</div>
+          <p><strong>Why does AI read books first?</strong> A Generative AI pre-trains on thousands of books and stories so it masters words and sentences before you give it a prompt!</p>
+        </div>
+      </aside>
+    </div>
+  `;
+
+  // Attach event handlers
+  const scanBtn = document.querySelector("#scan-books-btn");
+  const scanLabel = document.querySelector("#scan-btn-label");
+  const scanHelp = document.querySelector("#scan-help-caption");
+  const resultBox = document.querySelector("#genai-books-result-box");
+  const stageEl = document.querySelector("#genai-books-stage");
+  const laserEl = document.querySelector("#book-scanner-laser");
+
+  document.querySelector("#proceed-to-prompt-btn")?.addEventListener("click", () => {
+    state.generativeStage = "prompt";
+    renderGenerative();
+  });
+
+  scanBtn?.addEventListener("click", () => {
+    if (scanBtn.disabled) return;
+    scanBtn.disabled = true;
+    scanLabel.textContent = "Nova is scanning books...";
+    scanHelp.textContent = "Scanning bunch of books with sky-blue laser beam...";
+
+    // Activate laser scanner
+    stageEl?.classList.add("scanning-active");
+    laserEl?.classList.add("laser-active");
+
+    // Synthesis sound
+    playDragDropSound();
+
+    // Result box shows active absorption telemetry
+    if (resultBox) {
+      resultBox.innerHTML = `
+        <div class="books-scanning-telemetry">
+          <div class="telemetry-avatar-wrap">
+            ${renderRoboAvatar("#ffbd61", "#ed5c88", "#9effee", "NOVA")}
+            <div class="scanning-pulse-ring"></div>
+          </div>
+          <h3 id="telemetry-title" class="telemetry-title">Scanning Bunch of Books...</h3>
+          <p id="telemetry-sub" class="telemetry-sub">Nova is scanning encyclopedia knowledge, fables, and grammar...</p>
+          
+          <div class="telemetry-progress-track">
+            <div id="telemetry-progress-bar" class="telemetry-progress-bar" style="width: 20%;"></div>
+          </div>
+          <span id="telemetry-words-count" class="telemetry-words-count">Scanning books library...</span>
+
+          <div class="floating-token-stream">
+            <span class="token-chip chip-1">vocabulary</span>
+            <span class="token-chip chip-2">grammar_rules</span>
+            <span class="token-chip chip-3">story_structures</span>
+            <span class="token-chip chip-4">world_facts</span>
+            <span class="token-chip chip-5">emotions</span>
+          </div>
+        </div>
+      `;
+      refreshIcons();
+    }
+
+    setTimeout(() => {
+      const bar = document.querySelector("#telemetry-progress-bar");
+      const title = document.querySelector("#telemetry-title");
+      const sub = document.querySelector("#telemetry-sub");
+      if (bar) bar.style.width = "60%";
+      if (title) title.textContent = "Absorbing Vocabulary & Story Arcs...";
+      if (sub) sub.textContent = "Learning how trouble, suspense, and heroic rescues are written.";
+    }, 1200);
+
+    setTimeout(() => {
+      const bar = document.querySelector("#telemetry-progress-bar");
+      const title = document.querySelector("#telemetry-title");
+      const sub = document.querySelector("#telemetry-sub");
+      if (bar) bar.style.width = "90%";
+      if (title) title.textContent = "Finalizing Grammar & Sentence Flow...";
+      if (sub) sub.textContent = "Connecting language patterns for smooth story generation.";
+    }, 2400);
+
+    setTimeout(() => {
+      state.generativeBooksScanned = true;
+      stageEl?.classList.remove("scanning-active");
+      laserEl?.classList.remove("laser-active");
+      scanBtn.disabled = false;
+      scanLabel.textContent = "Re-scan Books";
+      scanHelp.textContent = "✨ Scanning completed! Now give Nova the 4 sentences.";
+
+      playEurekaSound();
+      toastMessage("🎉 <strong>Ready! Book scanning is completed!</strong>", true);
+
+      if (resultBox) {
+        resultBox.innerHTML = `
+          <div class="books-complete-card animate-drop">
+            <div class="complete-badge-ring">
+              <span class="complete-emoji">🎉</span>
+            </div>
+            <h3 class="complete-heading">Ready! Book Scanning is Completed!</h3>
+            <p class="complete-copy">Nova has successfully read and scanned the <strong>bunch of books</strong>. It has learned language, vocabulary, grammar, and storytelling patterns!</p>
+            
+            <div class="learned-capabilities-list">
+              <div class="cap-item"><span>📘</span> <strong>World Facts & Physics:</strong> Ponds, rain, and mud</div>
+              <div class="cap-item"><span>📖</span> <strong>Narrative Arc:</strong> Crisis, teamwork & rescue</div>
+              <div class="cap-item"><span>✍️</span> <strong>Grammar & Syntax:</strong> Fluent sentence transitions</div>
+            </div>
+
+            <div class="goto-prompt-wrap">
+              <button id="proceed-to-prompt-btn" class="button button-primary proceed-prompt-btn">
+                <span>Now Give 4 Sentences to Create a Story</span>${icon("arrow-right")}
+              </button>
+            </div>
+          </div>
+        `;
+        refreshIcons();
+
+        document.querySelector("#proceed-to-prompt-btn")?.addEventListener("click", () => {
+          state.generativeStage = "prompt";
+          renderGenerative();
+        });
+      }
+
+      const statusDot = document.querySelector("#reading-status-dot");
+      if (statusDot) {
+        statusDot.innerHTML = '<i class="status-dot"></i> Ready for Story Prompt';
+      }
+    }, 3800);
+  });
+}
+
+function renderGenerativePromptStage() {
   const pointsMarkup = villageDataPoints.map((pt, idx) => `
-    <div class="genai-point-item">
+    <div class="genai-point-item modern-point-item" id="prompt-card-${idx}">
       <span class="genai-point-icon">${pt.icon}</span>
       <div class="genai-point-text">
         <small>TRAINED SITUATION 0${idx + 1}</small>
         <p>${pt.text}</p>
       </div>
+      <span class="prompt-badge-check">${icon("check-circle-2")}</span>
     </div>
   `).join("");
 
-  content.innerHTML = `${header("CHAPTER 04 // GENERATIVE AI", "Create new things with trained data.", "Generative AI doesn't just classify or label examples—it uses patterns from the data it was trained on to create brand-new stories, images, or audio.", "04")}<div class="inspection-layout genai-layout"><section class="inspection-station"><div class="inspection-topline"><span>${icon("database")} TRAINED VILLAGE DATASET</span><small>4 LEARNED SITUATIONS</small></div><div class="genai-points-list">${pointsMarkup}</div><div class="genai-action-box"><button id="genai-action-btn" class="button button-primary" style="width:100%"><span>Teach Nova this data</span>${icon("brain-circuit")}</button><p id="genai-help-text" class="genai-help-text">Click to teach Nova these 4 village situations.</p></div></section><aside class="analysis-panel"><p class="kicker">NOVA'S GENERATIVE ENGINE</p><div id="genai-result" class="analysis-empty">${icon("book-heart")}<h3>Ready for Training</h3><p>Click <strong>"Teach Nova this data"</strong> on the left so Nova can learn these 4 village situations.</p></div><div class="finding warn">${icon("shield-alert")}<span>Generative AI creates new combinations from learned data. A human should always read and review generated stories.</span></div></aside></div>`;
+  content.innerHTML = `
+    ${header("CHAPTER 04 // GENERATIVE AI", "Step 2: Prompting — Create a Story from 4 Sentences", "Nova has read world books and mastered language. Now we provide these 4 specific village situations as a prompt, and ask Nova to imagine and generate a brand-new story!", "04")}
 
-  const actionBtn = document.querySelector("#genai-action-btn");
-  const helpText = document.querySelector("#genai-help-text");
-  const resultBox = document.querySelector("#genai-result");
-  let stage = "initial"; // "initial" -> "trained" -> "generated"
+    <!-- Top Pre-training Knowledge Banner -->
+    <div class="genai-knowledge-banner">
+      <div class="knowledge-banner-left">
+        <span class="status-pulse-dot"></span>
+        <span>FOUNDATION KNOWLEDGE ACTIVE: 6 BOOKS INGESTED (11.3M WORDS)</span>
+      </div>
+      <button id="back-to-books-btn" class="button button-outline back-books-btn" aria-label="Review Scanned Books">
+        ${icon("book-open")}
+        <span>View Scanned Books Library</span>
+      </button>
+    </div>
 
-  actionBtn.addEventListener("click", () => {
-    if (actionBtn.disabled) return;
-
-    if (stage === "initial") {
-      // Step 1: Train this dataset
-      actionBtn.disabled = true;
-      actionBtn.innerHTML = `<span>Training on dataset...</span>${icon("loader-circle")}`;
-      refreshIcons();
-      actionBtn.querySelector("svg")?.style.setProperty("animation", "spin 1s linear infinite");
-
-      resultBox.className = "analysis-loading";
-      resultBox.innerHTML = brainstormMarkup("Nova is learning the village patterns...", "Nova is studying the four situations and remembering details that can be combined into a new story.");
-      refreshIcons();
-
-      // Dissolve the 4 village situation cards into the brain/target
-      const genaiItems = document.querySelectorAll(".genai-point-item");
-      genaiItems.forEach((item, idx) => {
-        const itemRect = item.getBoundingClientRect();
-        const flyClone = document.createElement("div");
-        flyClone.className = "dissolve-fly-item";
-        flyClone.innerHTML = item.innerHTML;
-        flyClone.style.cssText = `
-          position:fixed; z-index:9999;
-          left:${itemRect.left + itemRect.width / 2}px;
-          top:${itemRect.top + itemRect.height / 2}px;
-          transform:translate(-50%,-50%) scale(1); opacity:1;
-          transition: all 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
-          pointer-events:none;
-        `;
-        document.body.appendChild(flyClone);
-
-        setTimeout(() => {
-          if (resultBox) {
-            const rRect = resultBox.getBoundingClientRect();
-            flyClone.style.left = `${rRect.left + rRect.width / 2}px`;
-            flyClone.style.top = `${rRect.top + rRect.height / 2}px`;
-          }
-          flyClone.style.transform = "translate(-50%,-50%) scale(0.2)";
-          flyClone.style.opacity = "0";
-        }, 150 + idx * 250);
-
-        setTimeout(() => flyClone.remove(), 1100 + idx * 250);
-      });
-
-      window.setTimeout(() => {
-        if (!document.body.contains(actionBtn)) return;
-
-        // Show Eureka screen for 2 seconds strictly, then reveal ready state
-        showEurekaPopup(() => {
-          stage = "trained";
-          actionBtn.disabled = false;
-          actionBtn.innerHTML = `<span>I'm ready, click here to generate new story on train data</span>${icon("sparkles")}`;
-          helpText.textContent = `✨ Training complete! Click the button above to generate a new story.`;
-          refreshIcons();
-
-          resultBox.className = "analysis-empty";
-          resultBox.innerHTML = `${icon("badge-check")}<h3 style="color:#0ea5e9">Model Trained & Ready!</h3><p>Your AI has learned the patterns from all 4 situations. Click <strong>"I'm ready, click here to generate new story on train data"</strong> on the left to create the story.</p>`;
-          refreshIcons();
-          toastMessage("Nova finished learning the 4 village situations!");
-        });
-      }, 4000);
-
-    } else if (stage === "trained") {
-      // Step 2: Generate new story on trained data
-      actionBtn.disabled = true;
-      actionBtn.innerHTML = `<span>Generating new story...</span>${icon("loader-circle")}`;
-      refreshIcons();
-      actionBtn.querySelector("svg")?.style.setProperty("animation", "spin 1s linear infinite");
-
-      resultBox.className = "analysis-loading";
-      resultBox.innerHTML = brainstormMarkup("Nova is imagining a new story...", "Nova is combining the muddy pond, evening storm, Amma's hut, and lantern rescue into a brand-new story.");
-      refreshIcons();
-
-      window.setTimeout(() => {
-        if (!document.body.contains(actionBtn)) return;
-        playEurekaSound();
-        stage = "generated";
-        actionBtn.disabled = false;
-        actionBtn.innerHTML = `<span>Regenerate story on trained data</span>${icon("sparkles")}`;
-        helpText.textContent = `Story generated from your 4 trained points.`;
-        refreshIcons();
-
-        const storyHtml = villageStoryData.paragraphs.map((p) => `<p class="created-story">${p}</p>`).join("");
-        const patternItems = villageStoryData.patterns.map((reason) => `<li>${icon("sparkles")}<span>${reason}</span></li>`).join("");
-
-        resultBox.className = "story-output";
-        resultBox.innerHTML = `
-          <span class="output-label">GENERATED STORY</span>
-          <h3>${villageStoryData.title}</h3>
-          ${storyHtml}
-          <div style="margin-top:18px;padding-top:14px;border-top:1px dashed rgba(67,119,183,0.25);">
-            <button id="goto-applications-btn" class="button button-primary" style="width:100%;">
-              <span>Proceed to AI Applications (Ch 05)</span>${icon("arrow-right")}
-            </button>
+    <!-- Main Inspection Split -->
+    <div class="inspection-layout genai-layout modern-inspection-layout" style="margin-top:16px;">
+      <!-- Left: 4 Sentences Prompt List -->
+      <section class="inspection-station modern-station-card">
+        <div class="inspection-topline modern-topline">
+          <div class="topline-left">
+            <span class="station-icon-glow">${icon("database")}</span>
+            <span class="station-heading">INPUT PROMPT // 4 VILLAGE SITUATIONS</span>
           </div>
-        `;
-        refreshIcons();
-        complete("generative");
-        toastMessage("🎉 <strong>Story Created!</strong> Nova unlocked Chapter 05!", true);
+          <span class="station-badge">4 TRAINED SITUATIONS</span>
+        </div>
+        <p class="station-desc">These 4 sentences are the creative prompt given to Nova. Nova will synthesize its learned book patterns with these 4 situations:</p>
+        
+        <div class="genai-points-list">
+          ${pointsMarkup}
+        </div>
 
-        document.querySelector("#goto-applications-btn")?.addEventListener("click", () => {
-          showNovaUpgradeTransition(4, "applications");
-        });
+        <div class="genai-action-box" style="margin-top:20px;">
+          <button id="genai-create-story-btn" class="button button-primary genai-story-action-btn" style="width:100%;">
+            <span>Ask Nova to Create a Story</span>${icon("sparkles")}
+          </button>
+          <p id="genai-help-text" class="genai-help-text">Click to prompt Nova to synthesize these 4 situations into a brand-new narrative.</p>
+        </div>
+      </section>
 
-        document.querySelector("#what-is-genai-btn")?.addEventListener("click", () => {
-          const card = document.querySelector("#genai-concept-card");
-          if (card) {
-            card.classList.toggle("hidden");
-            refreshIcons();
-          }
-        });
-      }, 4000);
+      <!-- Right: Nova Generative Imagination Output -->
+      <aside class="analysis-panel modern-analysis-card">
+        <div class="analysis-topline">
+          <p class="kicker modern-kicker">${icon("sparkles")} NOVA'S STORYTELLING CORE</p>
+          <span class="ai-status-indicator"><i class="status-dot"></i> Neural Imagination Ready</span>
+        </div>
 
-    } else if (stage === "generated") {
-      // Re-trigger generation animation if clicked again
-      stage = "trained";
-      actionBtn.click();
-    }
+        <div id="genai-story-result" class="analysis-empty modern-insight-empty">
+          <div class="empty-sparkle-orb">
+            ${renderRoboAvatar("#ffbd61", "#ed5c88", "#9effee", "NOVA")}
+          </div>
+          <h3>Ready to Generate Story</h3>
+          <p>Nova has stored its book foundation and is waiting for your command. Click <strong>"Ask Nova to Create a Story"</strong> on the left to combine the 4 village situations!</p>
+          <div class="empty-instruction-chip">
+            ${icon("pen-tool")}
+            <span>Nova will weave the muddy pond, evening storm, Amma's hut, and lantern rescue into a cohesive story.</span>
+          </div>
+        </div>
+
+        <div class="finding warn modern-finding-notice" style="margin-top:14px;">
+          ${icon("shield-alert")}
+          <span><strong>AI Reality Check:</strong> Generative AI creates new combinations from learned data. A human should always read, fact-check, and review AI-generated text.</span>
+        </div>
+      </aside>
+    </div>
+  `;
+
+  document.querySelector("#back-to-books-btn")?.addEventListener("click", () => {
+    state.generativeStage = "books";
+    renderGenerative();
+  });
+
+  const createBtn = document.querySelector("#genai-create-story-btn");
+  const helpText = document.querySelector("#genai-help-text");
+  const resultBox = document.querySelector("#genai-story-result");
+
+  createBtn?.addEventListener("click", () => {
+    if (createBtn.disabled) return;
+    createBtn.disabled = true;
+    createBtn.innerHTML = `<span>Nova is imagining story...</span>${icon("loader-circle")}`;
+    refreshIcons();
+    createBtn.querySelector("svg")?.style.setProperty("animation", "spin 1s linear infinite");
+
+    resultBox.className = "analysis-loading";
+    resultBox.innerHTML = brainstormMarkup(
+      "Nova is imagining a brand-new story...",
+      "Synthesizing book storytelling grammar with the muddy pond, evening storm, Amma's hut, and lantern rescue..."
+    );
+    refreshIcons();
+
+    // Fly situation cards into Nova's imagination core
+    const genaiItems = document.querySelectorAll(".genai-point-item");
+    genaiItems.forEach((item, idx) => {
+      const itemRect = item.getBoundingClientRect();
+      const flyClone = document.createElement("div");
+      flyClone.className = "dissolve-fly-item";
+      flyClone.innerHTML = item.innerHTML;
+      flyClone.style.cssText = `
+        position:fixed; z-index:9999;
+        left:${itemRect.left + itemRect.width / 2}px;
+        top:${itemRect.top + itemRect.height / 2}px;
+        transform:translate(-50%,-50%) scale(1); opacity:1;
+        transition: all 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
+        pointer-events:none;
+      `;
+      document.body.appendChild(flyClone);
+
+      setTimeout(() => {
+        if (resultBox) {
+          const rRect = resultBox.getBoundingClientRect();
+          flyClone.style.left = `${rRect.left + rRect.width / 2}px`;
+          flyClone.style.top = `${rRect.top + rRect.height / 2}px`;
+        }
+        flyClone.style.transform = "translate(-50%,-50%) scale(0.2)";
+        flyClone.style.opacity = "0";
+      }, 150 + idx * 250);
+
+      setTimeout(() => flyClone.remove(), 1100 + idx * 250);
+    });
+
+    window.setTimeout(() => {
+      if (!document.body.contains(createBtn)) return;
+      playEurekaSound();
+      createBtn.disabled = false;
+      createBtn.innerHTML = `<span>Regenerate story</span>${icon("sparkles")}`;
+      helpText.textContent = "Story successfully synthesized from books + your 4 input situations.";
+      refreshIcons();
+
+      const paragraphsMarkup = villageStoryData.paragraphs.map((p) => `
+        <p class="story-paragraph">${p}</p>
+      `).join("");
+
+      resultBox.className = "story-output modern-story-output no-scroll-story";
+      resultBox.innerHTML = `
+        <div class="story-output-header">
+          <span class="output-label">${icon("sparkles")} ORIGINAL AI GENERATED STORY</span>
+          <h3 class="story-title">${villageStoryData.title}</h3>
+        </div>
+
+        <div class="story-single-card">
+          ${paragraphsMarkup}
+        </div>
+
+        <div class="story-proceed-wrap">
+          <button id="goto-applications-btn" class="button button-primary modern-proceed-btn" style="width:100%;">
+            <span>Proceed to AI Applications (Ch 05)</span>${icon("arrow-right")}
+          </button>
+        </div>
+      `;
+
+      // Hide the reality check notice when story is rendered to ensure zero vertical scroll
+      const notice = document.querySelector(".modern-finding-notice");
+      if (notice) notice.style.display = "none";
+      refreshIcons();
+      complete("generative");
+      toastMessage("🎉 <strong>Story Created!</strong> Nova unlocked Chapter 05!", true);
+
+      document.querySelector("#goto-applications-btn")?.addEventListener("click", () => {
+        showNovaUpgradeTransition(4, "applications");
+      });
+    }, 4000);
   });
 }
+
 
 const aiApplicationsData = [
   {
@@ -2908,6 +3878,61 @@ function showFullscreenBrainstorm(onComplete) {
   }, 2200);
 }
 
+
+function renderNovaCoreIcon(size = 46, showBadges = true) {
+  return `
+    <div class="creator-nova-core-badge" style="width:${size}px;height:${size}px;" title="Extracted Nova Intelligence Core">
+      <svg viewBox="0 0 100 100" width="100%" height="100%" style="overflow:visible;">
+        <defs>
+          <radialGradient id="miniCoreOrbGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ffffff" />
+            <stop offset="30%" stop-color="#38bdf8" />
+            <stop offset="70%" stop-color="#6366f1" />
+            <stop offset="100%" stop-color="#1e1b4b" />
+          </radialGradient>
+          <filter id="miniCoreGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="2.5" result="b" />
+            <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+          </filter>
+        </defs>
+        <!-- Dark Cyber Circular Base -->
+        <circle cx="50" cy="50" r="48" fill="#070c24" stroke="rgba(56,189,248,0.4)" stroke-width="1.2" />
+        
+        <!-- Outer Dashed Cyan Orbit Ring -->
+        <circle cx="50" cy="50" r="44" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4,3" opacity="0.9" />
+        
+        <!-- Middle Rotated Rounded Diamond Ring -->
+        <rect x="23" y="23" width="54" height="54" rx="15" transform="rotate(45 50 50)" fill="none" stroke="#c084fc" stroke-width="2.5" filter="url(#miniCoreGlow)" />
+        <rect x="24" y="24" width="52" height="52" rx="14" transform="rotate(45 50 50)" fill="none" stroke="#38bdf8" stroke-width="1.2" opacity="0.85" />
+        
+        <!-- Central Radiant Pulsating Orb -->
+        <circle cx="50" cy="50" r="22" fill="url(#miniCoreOrbGrad)" filter="url(#miniCoreGlow)" />
+        
+        <!-- White Glowing 4-Point Star -->
+        <path d="M 50,36 Q 50,50 64,50 Q 50,50 50,64 Q 50,50 36,50 Q 50,50 50,36 Z" fill="#ffffff" filter="url(#miniCoreGlow)" />
+        
+        ${showBadges ? `
+          <!-- Orbiting Skill Badges -->
+          <g>
+            <rect x="27" y="1" width="46" height="15" rx="5" fill="#0284c7" stroke="#38bdf8" stroke-width="1" />
+            <text x="50" y="11.5" font-size="8" font-weight="bold" fill="#ffffff" text-anchor="middle">👁️ Vision</text>
+          </g>
+
+          <g>
+            <rect x="0" y="81" width="44" height="15" rx="5" fill="#d97706" stroke="#fbbf24" stroke-width="1" />
+            <text x="22" y="91.5" font-size="8" font-weight="bold" fill="#ffffff" text-anchor="middle">🎵 Audio</text>
+          </g>
+
+          <g>
+            <rect x="56" y="81" width="44" height="15" rx="5" fill="#9333ea" stroke="#c084fc" stroke-width="1" />
+            <text x="78" y="91.5" font-size="8" font-weight="bold" fill="#ffffff" text-anchor="middle">✨ Story</text>
+          </g>
+        ` : ""}
+      </svg>
+    </div>
+  `;
+}
+
 function renderCyberHomeGraphic(isCctv, isHero, heroName = "STARBYTE", primary = "#ffbd61", glow = "#38bdf8") {
   return `
     <svg viewBox="0 0 400 270" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:480px;height:250px;">
@@ -2987,8 +4012,19 @@ function renderCyberHomeGraphic(isCctv, isHero, heroName = "STARBYTE", primary =
       ${isHero ? `
         <g filter="url(#homeGlow)">
           <path d="M 35,240 Q 207,-20 375,240" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-dasharray="10,5" />
-          <circle cx="207" cy="45" r="16" fill="rgba(251,191,36,0.3)" stroke="#fbbf24" stroke-width="2" />
-          <text x="207" y="51" font-size="14" font-weight="bold" text-anchor="middle" fill="#fbbf24">⚡</text>
+          <g transform="translate(182, 20) scale(0.5)">
+            <circle cx="50" cy="50" r="48" fill="#070c24" stroke="#38bdf8" stroke-width="1.5" />
+            <circle cx="50" cy="50" r="44" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4,3" />
+            <rect x="23" y="23" width="54" height="54" rx="15" transform="rotate(45 50 50)" fill="none" stroke="#c084fc" stroke-width="3" />
+            <circle cx="50" cy="50" r="22" fill="#38bdf8" />
+            <path d="M 50,36 Q 50,50 64,50 Q 50,50 50,64 Q 50,50 36,50 Q 50,50 50,36 Z" fill="#ffffff" />
+            <rect x="27" y="1" width="46" height="15" rx="5" fill="#0284c7" stroke="#38bdf8" stroke-width="1" />
+            <text x="50" y="11.5" font-size="8" font-weight="bold" fill="#ffffff" text-anchor="middle">👁️ Vision</text>
+            <rect x="0" y="81" width="44" height="15" rx="5" fill="#d97706" stroke="#fbbf24" stroke-width="1" />
+            <text x="22" y="91.5" font-size="8" font-weight="bold" fill="#ffffff" text-anchor="middle">🎵 Audio</text>
+            <rect x="56" y="81" width="44" height="15" rx="5" fill="#9333ea" stroke="#c084fc" stroke-width="1" />
+            <text x="78" y="91.5" font-size="8" font-weight="bold" fill="#ffffff" text-anchor="middle">✨ Story</text>
+          </g>
         </g>
       ` : ""}
     </svg>
@@ -3089,10 +4125,19 @@ function renderCyberCarGraphic(isHero = false, isAi = false, heroName = "STARBYT
       <!-- Hero AI Core Crest / Dome -->
       ${isHero ? `
         <g filter="url(#carNeonGlow)">
-          <circle cx="80" cy="135" r="22" fill="#0f172a" stroke="${primary}" stroke-width="2" />
-          <circle cx="80" cy="135" r="16" fill="rgba(251,191,36,0.3)" stroke="#fbbf24" stroke-width="2" />
-          <text x="80" y="141" font-size="16" font-weight="bold" text-anchor="middle" fill="#fbbf24">⚡</text>
-          <circle cx="80" cy="135" r="26" fill="none" stroke="${glow}" stroke-width="1.5" stroke-dasharray="6,3" />
+          <g transform="translate(56, 111) scale(0.48)">
+            <circle cx="50" cy="50" r="48" fill="#070c24" stroke="#38bdf8" stroke-width="1.5" />
+            <circle cx="50" cy="50" r="44" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4,3" />
+            <rect x="23" y="23" width="54" height="54" rx="15" transform="rotate(45 50 50)" fill="none" stroke="#c084fc" stroke-width="3" />
+            <circle cx="50" cy="50" r="22" fill="#38bdf8" />
+            <path d="M 50,36 Q 50,50 64,50 Q 50,50 50,64 Q 50,50 36,50 Q 50,50 50,36 Z" fill="#ffffff" />
+            <rect x="27" y="1" width="46" height="15" rx="5" fill="#0284c7" stroke="#38bdf8" stroke-width="1" />
+            <text x="50" y="11.5" font-size="8" font-weight="bold" fill="#ffffff" text-anchor="middle">👁️ Vision</text>
+            <rect x="0" y="81" width="44" height="15" rx="5" fill="#d97706" stroke="#fbbf24" stroke-width="1" />
+            <text x="22" y="91.5" font-size="8" font-weight="bold" fill="#ffffff" text-anchor="middle">🎵 Audio</text>
+            <rect x="56" y="81" width="44" height="15" rx="5" fill="#9333ea" stroke="#c084fc" stroke-width="1" />
+            <text x="78" y="91.5" font-size="8" font-weight="bold" fill="#ffffff" text-anchor="middle">✨ Story</text>
+          </g>
         </g>
       ` : ""}
     </svg>
@@ -3179,9 +4224,19 @@ function renderCyberRoboticArmGraphic(isHero = false, isAi = false, heroName = "
       <!-- Superhero AI Core Crest mounted on arm base -->
       ${isHero ? `
         <g filter="url(#armGlow)">
-          <circle cx="150" cy="25" r="16" fill="#0f172a" stroke="${primary}" stroke-width="2" />
-          <circle cx="150" cy="25" r="12" fill="rgba(251,191,36,0.3)" stroke="#fbbf24" stroke-width="1.5" />
-          <text x="150" y="30" font-size="12" font-weight="bold" text-anchor="middle" fill="#fbbf24">⚡</text>
+          <g transform="translate(130, 5) scale(0.4)">
+            <circle cx="50" cy="50" r="48" fill="#070c24" stroke="#38bdf8" stroke-width="1.5" />
+            <circle cx="50" cy="50" r="44" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4,3" />
+            <rect x="23" y="23" width="54" height="54" rx="15" transform="rotate(45 50 50)" fill="none" stroke="#c084fc" stroke-width="3" />
+            <circle cx="50" cy="50" r="22" fill="#38bdf8" />
+            <path d="M 50,36 Q 50,50 64,50 Q 50,50 50,64 Q 50,50 36,50 Q 50,50 50,36 Z" fill="#ffffff" />
+            <rect x="27" y="1" width="46" height="15" rx="5" fill="#0284c7" stroke="#38bdf8" stroke-width="1" />
+            <text x="50" y="11.5" font-size="8" font-weight="bold" fill="#ffffff" text-anchor="middle">👁️ Vision</text>
+            <rect x="0" y="81" width="44" height="15" rx="5" fill="#d97706" stroke="#fbbf24" stroke-width="1" />
+            <text x="22" y="91.5" font-size="8" font-weight="bold" fill="#ffffff" text-anchor="middle">🎵 Audio</text>
+            <rect x="56" y="81" width="44" height="15" rx="5" fill="#9333ea" stroke="#c084fc" stroke-width="1" />
+            <text x="78" y="91.5" font-size="8" font-weight="bold" fill="#ffffff" text-anchor="middle">✨ Story</text>
+          </g>
         </g>
       ` : ""}
     </svg>
@@ -3373,8 +4428,8 @@ function renderCreator() {
 
         <!-- 2. Extracted Nova Intelligence Core -->
         <div class="surveillance-item-card ${isHeroAttached ? "used" : (!isCctvAttached ? "disabled-card" : "")}" draggable="${isCctvAttached && !isHeroAttached}" data-item="hero" id="drag-hero" style="${!isCctvAttached ? "opacity:0.5;cursor:not-allowed;" : ""}">
-          <div class="surveillance-item-icon" style="background:#fef3c7;color:#b45309;">
-            ⚡
+          <div class="surveillance-item-icon nova-core-item-icon">
+            ${renderNovaCoreIcon(46, true)}
           </div>
           <div class="surveillance-item-info">
             <strong>Nova Intelligence Core</strong>
@@ -3433,8 +4488,8 @@ function renderCreator() {
     state.creatorStage = "active";
     persistProgress();
     complete("creator");
-    playFantasySound();
-    toastMessage("🏠 AI Home Surveillance is Ready", true);
+    playCoreExplosionSound();
+    toastMessage("✦ Nova Intelligence Core infused into Home Surveillance!", true);
     renderCreator();
   };
 
@@ -3476,50 +4531,239 @@ function renderCreator() {
   refreshIcons();
 }
 
+function playCoreExplosionSound() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+
+    // 1. High-frequency energy charge sweep
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(130, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(950, ctx.currentTime + 1.8);
+    gain.gain.setValueAtTime(0.04, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.28, ctx.currentTime + 1.75);
+    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 1.85);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 1.85);
+
+    // 2. Heavy explosion shockwave boom at 1.8s
+    setTimeout(() => {
+      try {
+        const boomCtx = new AudioCtx();
+        const bufferSize = boomCtx.sampleRate * 1.5;
+        const buffer = boomCtx.createBuffer(1, bufferSize, boomCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (boomCtx.sampleRate * 0.35));
+        }
+        const noise = boomCtx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = boomCtx.createBiquadFilter();
+        filter.type = "lowpass";
+        filter.frequency.setValueAtTime(320, boomCtx.currentTime);
+        filter.frequency.exponentialRampToValueAtTime(35, boomCtx.currentTime + 1.3);
+
+        const boomGain = boomCtx.createGain();
+        boomGain.gain.setValueAtTime(0.7, boomCtx.currentTime);
+        boomGain.gain.exponentialRampToValueAtTime(0.01, boomCtx.currentTime + 1.3);
+
+        noise.connect(filter);
+        filter.connect(boomGain);
+        boomGain.connect(boomCtx.destination);
+        noise.start();
+
+        playEurekaSound();
+      } catch (err) {}
+    }, 1800);
+  } catch (e) {
+    playEurekaSound();
+  }
+}
+
 function renderExtract() {
   const extracted = Boolean(state.intelligenceExtracted);
+  
   content.innerHTML = `
     ${header("CHAPTER 07 // EXTRACT INTELLIGENCE", "Transfer Nova's learned intelligence.", "Nova has learned to recognize images, listen for sound patterns, and create content. Extract those learned skills into a portable Intelligence Core for the Creator Lab.", "07")}
-    <section class="intelligence-extraction-stage ${extracted ? "core-extracted" : ""}">
+    
+    <section class="intelligence-extraction-stage modern-extract-stage ${extracted ? "core-extracted" : ""}" id="extraction-stage">
       <div class="extract-grid"></div>
+      <div class="shockwave-burst-overlay" id="shockwave-overlay"></div>
+      
       <div class="intelligence-data-stream" aria-hidden="true">
-        <i>👓</i><i>📶</i><i>✨</i><i>✦</i><i>◈</i><i>⌁</i>
+        <i>👓</i><i>📶</i><i>✨</i><i>✦</i><i>◈</i><i>⌁</i><i>⚡</i><i>💡</i>
       </div>
-      <div class="extract-nova-wrap">
-        ${renderRoboAvatar(state.hero.primary, state.hero.secondary, state.hero.glow, "NOVA", 4)}
-        <span class="extract-label">MEGA NOVA // ALL SKILLS READY</span>
+
+      <!-- Left: Nova Avatar (Mega Form before extraction, Base Form after) -->
+      <div class="extract-nova-wrap" id="extract-nova-wrap">
+        <div id="nova-avatar-container" class="nova-avatar-frame ${extracted ? "base-form" : "mega-form"}">
+          ${extracted 
+            ? renderRoboAvatar(state.hero.primary, state.hero.secondary, state.hero.glow, "NOVA", 1)
+            : renderRoboAvatar(state.hero.primary, state.hero.secondary, state.hero.glow, "NOVA", 4)
+          }
+        </div>
+        <span class="extract-label" id="extract-nova-label">
+          ${extracted ? "ORIGINAL NOVA // BASE FORM (SKILLS TRANSFERRED)" : "MEGA NOVA // ALL SKILLS READY"}
+        </span>
       </div>
-      <div class="extract-beam"><span></span><b>SKILL TRANSFER</b></div>
-      <div class="intelligence-core-unit ${extracted ? "ready" : ""}" id="intelligence-core-unit">
-        <div class="core-shell"><div class="core-light">✦</div></div>
-        <strong>NOVA INTELLIGENCE CORE</strong>
-        <small>${extracted ? "READY FOR CREATOR LAB" : "WAITING FOR EXTRACTION"}</small>
+
+      <!-- Center: Skill Transfer Energy Conduit -->
+      <div class="extract-beam modern-extract-beam">
+        <span class="beam-glow-line"></span>
+        <div class="beam-energy-particles">
+          <i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <b>SKILL TRANSFER</b>
+      </div>
+
+      <!-- Right: Intelligence Core (Small Dormant before, Massive Exploded Core after) -->
+      <div class="intelligence-core-unit ${extracted ? "mega-core-active" : "dormant-core-idle"}" id="intelligence-core-unit">
+        <div id="core-display-wrap" class="core-display-wrap">
+          ${extracted ? `
+            <div class="core-shell-mega animate-explode-settle">
+              <div class="mega-shockwave-ring ring-1"></div>
+              <div class="mega-shockwave-ring ring-2"></div>
+              <div class="mega-orbit-ring orbit-a"></div>
+              <div class="mega-orbit-ring orbit-b"></div>
+              <div class="mega-core-orb">
+                <span class="core-inner-glow">✦</span>
+              </div>
+              <div class="floating-core-skills">
+                <span class="core-skill-badge s-1">👁️ Vision</span>
+                <span class="core-skill-badge s-2">🎵 Audio</span>
+                <span class="core-skill-badge s-3">✨ Story</span>
+              </div>
+            </div>
+          ` : `
+            <div class="core-shell-compact" id="compact-core">
+              <div class="compact-core-inner">
+                <div class="compact-core-light">✦</div>
+              </div>
+            </div>
+          `}
+        </div>
+
+        <strong id="core-title-text" class="core-title-text ${extracted ? "mega-title" : ""}">
+          ${extracted ? "PORTABLE NOVA INTELLIGENCE CORE" : "INTELLIGENCE CORE RECEPTACLE"}
+        </strong>
+        <small id="core-status-text" class="core-status-text ${extracted ? "mega-status" : ""}">
+          ${extracted ? "✦ CHARGED & READY FOR CREATOR LAB" : "DORMANT • AWAITING EXTRACTION"}
+        </small>
       </div>
     </section>
-    <section class="extract-skill-list"><span>👓 Image Recognition</span><span>📶 Sound Pattern Listening</span><span>✨ Content Creation</span></section>
-    <button id="extract-intelligence-btn" class="button button-primary extract-button" ${extracted ? "disabled" : ""}>
-      <span>${extracted ? "Nova Intelligence Core Extracted" : "Extract Nova Intelligence"}</span>${icon(extracted ? "badge-check" : "zap")}
-    </button>
-    ${extracted ? `<button id="goto-creator-from-extract" class="button button-outline extract-continue"><span>Use Nova Intelligence Core in Creator Lab</span>${icon("arrow-right")}</button>` : ""}
+
+    <section class="extract-skill-list">
+      <span>👓 Image Recognition</span>
+      <span>📶 Sound Pattern Listening</span>
+      <span>✨ Content Creation</span>
+    </section>
+
+    <div class="extract-action-row" style="margin-top:16px;">
+      <button id="extract-intelligence-btn" class="button button-primary extract-button" ${extracted ? "disabled" : ""}>
+        <span>${extracted ? "Nova Intelligence Core Extracted" : "Extract Nova Intelligence"}</span>${icon(extracted ? "badge-check" : "zap")}
+      </button>
+      ${extracted ? `<button id="goto-creator-from-extract" class="button button-primary extract-continue"><span>Use Nova Intelligence Core in Creator Lab</span>${icon("arrow-right")}</button>` : ""}
+    </div>
   `;
+
   document.querySelector("#extract-intelligence-btn")?.addEventListener("click", (event) => {
     const button = event.currentTarget;
+    if (button.disabled) return;
     button.disabled = true;
-    button.innerHTML = `<span>Extracting Nova's learned skills...</span>${icon("loader-circle")}`;
+    button.innerHTML = `<span>Initiating Quantum Extraction...</span>${icon("loader-circle")}`;
     refreshIcons();
-    const stage = document.querySelector(".intelligence-extraction-stage");
-    stage?.classList.add("extracting", "extract-charge");
-    setTimeout(() => stage?.classList.replace("extract-charge", "extract-stream"), 700);
-    setTimeout(() => stage?.classList.replace("extract-stream", "extract-lock"), 2700);
+    button.querySelector("svg")?.style.setProperty("animation", "spin 1s linear infinite");
+
+    const stage = document.querySelector("#extraction-stage");
+    const beam = document.querySelector(".modern-extract-beam");
+    const compactCore = document.querySelector("#compact-core");
+    const coreDisplayWrap = document.querySelector("#core-display-wrap");
+    const coreTitle = document.querySelector("#core-title-text");
+    const coreStatus = document.querySelector("#core-status-text");
+    const novaAvatarContainer = document.querySelector("#nova-avatar-container");
+    const novaLabel = document.querySelector("#extract-nova-label");
+    const shockwaveOverlay = document.querySelector("#shockwave-overlay");
+
+    // Phase 1: Energy Transfer starts
+    stage?.classList.add("extracting-phase");
+    beam?.classList.add("beam-surging");
+    compactCore?.classList.add("core-charging-shake");
+    playCoreExplosionSound();
+
+    // Data stream flows into core
+    setTimeout(() => {
+      stage?.classList.add("data-streaming");
+      if (coreStatus) coreStatus.textContent = "CHARGING WITH SKILL STREAMS...";
+    }, 700);
+
+    // Phase 2: Critical Mass & Explosion into Big Size (at 1.8s)
+    setTimeout(() => {
+      stage?.classList.remove("data-streaming");
+      stage?.classList.add("stage-exploded");
+      shockwaveOverlay?.classList.add("shockwave-active");
+
+      // Replace small core with the explosive BIG mega core
+      if (coreDisplayWrap) {
+        coreDisplayWrap.innerHTML = `
+          <div class="core-shell-mega exploding-blast">
+            <div class="mega-shockwave-ring ring-1"></div>
+            <div class="mega-shockwave-ring ring-2"></div>
+            <div class="mega-orbit-ring orbit-a"></div>
+            <div class="mega-orbit-ring orbit-b"></div>
+            <div class="mega-core-orb">
+              <span class="core-inner-glow">✦</span>
+            </div>
+            <div class="floating-core-skills">
+              <span class="core-skill-badge s-1">👁️ Vision</span>
+              <span class="core-skill-badge s-2">🎵 Audio</span>
+              <span class="core-skill-badge s-3">✨ Story</span>
+            </div>
+          </div>
+        `;
+      }
+
+      const coreUnit = document.querySelector("#intelligence-core-unit");
+      coreUnit?.classList.remove("dormant-core-idle");
+      coreUnit?.classList.add("mega-core-active");
+
+      if (coreTitle) {
+        coreTitle.textContent = "PORTABLE NOVA INTELLIGENCE CORE";
+        coreTitle.classList.add("mega-title");
+      }
+      if (coreStatus) {
+        coreStatus.textContent = "✦ SKILLS ABSORBED • EXPANDED & READY";
+        coreStatus.classList.add("mega-status");
+      }
+    }, 1800);
+
+    // Phase 3: Nova gracefully transitions back to its PAST BASE FORM (Level 1)
+    setTimeout(() => {
+      if (novaAvatarContainer) {
+        novaAvatarContainer.classList.add("transition-to-base");
+        novaAvatarContainer.innerHTML = renderRoboAvatar(state.hero.primary, state.hero.secondary, state.hero.glow, "NOVA", 1);
+      }
+      if (novaLabel) {
+        novaLabel.textContent = "ORIGINAL NOVA // BASE FORM (SKILLS TRANSFERRED)";
+        novaLabel.classList.add("base-label-highlight");
+      }
+      toastMessage("✨ Skills transferred! Nova returned to original base form.", true);
+    }, 2500);
+
+    // Phase 4: Finalize and lock completed state
     setTimeout(() => {
       state.intelligenceExtracted = true;
       complete("extract");
       persistProgress();
-      playEurekaSound();
-      toastMessage("✦ Nova Intelligence Core is ready for Creator Lab!", true);
       renderExtract();
+      toastMessage("🎉 <strong>Nova Intelligence Core is ready for Creator Lab!</strong>", true);
     }, 4000);
   });
+
   document.querySelector("#goto-creator-from-extract")?.addEventListener("click", () => navigate("creator"));
   refreshIcons();
 }
@@ -3733,9 +4977,11 @@ function renderCreatorCarLab() {
           </p>
 
           <div class="surveillance-item-card ${isHeroAttached ? "used" : ""}" draggable="${!isHeroAttached}" id="drag-car-hero">
-            <div class="surveillance-item-icon" style="background:#fef3c7;color:#b45309;">⚡</div>
+            <div class="surveillance-item-icon nova-core-item-icon">
+            ${renderNovaCoreIcon(46, true)}
+          </div>
             <div class="surveillance-item-info">
-              <strong>${heroName} (AI Core)</strong>
+              <strong>Nova Intelligence Core</strong>
               <small>${isHeroAttached ? "✅ Installed on Cyber Car" : "Drag to Cyber Car"}</small>
             </div>
           </div>
@@ -3746,7 +4992,7 @@ function renderCreatorCarLab() {
             Autonomous Cyber Car Workshop
           </h3>
           <p style="margin:0 0 6px;font-size:12px;color:#94a3b8;">
-            ${isHeroAttached ? "✅ Superhero AI Neural Core Installed!" : "Drag or tap " + heroName + " into the car below."}
+            ${isHeroAttached ? "✅ Nova Intelligence Core Installed!" : "Drag or tap " + heroName + " into the car below."}
           </p>
 
           <div style="width:160px;height:240px;margin:16px 0;">
@@ -3771,8 +5017,8 @@ function renderCreatorCarLab() {
       if (state.carHeroAttached) return;
       state.carHeroAttached = true;
       persistProgress();
-      playEurekaSound();
-      toastMessage(`⚡ ${heroName} AI Core infused into Cyber Car!`, true);
+      playCoreExplosionSound();
+      toastMessage("✦ Nova Intelligence Core infused into Cyber Car!", true);
       state.carMode = "self_driving";
       renderCreatorCarLab();
     };
@@ -4159,9 +5405,11 @@ function renderCreatorParcelLab() {
           </p>
 
           <div class="surveillance-item-card ${isHeroAttached ? "used" : ""}" draggable="${!isHeroAttached}" id="drag-arm-hero">
-            <div class="surveillance-item-icon" style="background:#fef3c7;color:#b45309;">⚡</div>
+            <div class="surveillance-item-icon nova-core-item-icon">
+            ${renderNovaCoreIcon(46, true)}
+          </div>
             <div class="surveillance-item-info">
-              <strong>${heroName} (AI Core)</strong>
+              <strong>Nova Intelligence Core</strong>
               <small>${isHeroAttached ? "✅ Installed on Robotic Arm" : "Drag to Robotic Arm"}</small>
             </div>
           </div>
@@ -4178,7 +5426,7 @@ function renderCreatorParcelLab() {
             Industrial Cyber Robotic Workshop
           </h3>
           <p style="margin:0 0 6px;font-size:12px;color:#94a3b8;">
-            ${isHeroAttached ? "✅ Superhero AI Neural Core Installed!" : "Drag or tap " + heroName + " into the robotic arm below."}
+            ${isHeroAttached ? "✅ Nova Intelligence Core Installed!" : "Drag or tap " + heroName + " into the robotic arm below."}
           </p>
 
           <div style="width:260px;height:200px;margin:16px 0;">
@@ -4203,8 +5451,8 @@ function renderCreatorParcelLab() {
       if (state.parcelHeroAttached) return;
       state.parcelHeroAttached = true;
       persistProgress();
-      playEurekaSound();
-      toastMessage(`⚡ ${heroName} AI Core infused into Robotic Arm!`, true);
+      playCoreExplosionSound();
+      toastMessage("✦ Nova Intelligence Core infused into Robotic Arm!", true);
       state.parcelMode = "ai_sorting";
       renderCreatorParcelLab();
     };
